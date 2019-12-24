@@ -2,17 +2,14 @@
 
 namespace Gammadia\Collections\Functional;
 
-use Traversable;
-use UnexpectedValueException;
-
 final class Util
 {
-    public static function assertTraversable($traversable)
+    public static function assertIterable($traversable)
     {
-        if (is_array($traversable) || $traversable instanceof Traversable) {
+        if (is_iterable($traversable)) {
             return $traversable;
         }
 
-        throw new UnexpectedValueException('Traversable expected');
+        throw new \UnexpectedValueException('Traversable expected');
     }
 }

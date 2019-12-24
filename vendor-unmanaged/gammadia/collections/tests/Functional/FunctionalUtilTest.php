@@ -4,20 +4,19 @@ namespace Gammadia\Collections\Test\Unit\Functional;
 
 use Gammadia\Collections\Functional\Util;
 use PHPUnit\Framework\TestCase;
-use UnexpectedValueException;
 
 final class FunctionalUtilTest extends TestCase
 {
-    public function test_assertTraversable()
+    public function test_assertIterable(): void
     {
         $array = [];
-        self::assertEquals($array, Util::assertTraversable([]));
+        self::assertEquals($array, Util::assertIterable([]));
 
-        $fn = function () { yield 2; };
+        $fn = static function () { yield 2; };
         $generator = $fn();
-        self::assertEquals($generator, Util::assertTraversable($generator));
+        self::assertEquals($generator, Util::assertIterable($generator));
 
-        self::expectException(UnexpectedValueException::class);
-        Util::assertTraversable(42);
+        $this->expectException(\UnexpectedValueException::class);
+        Util::assertIterable(42);
     }
 }

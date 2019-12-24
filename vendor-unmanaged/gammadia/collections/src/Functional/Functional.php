@@ -51,7 +51,7 @@ function chunk(array $array, int $size, bool $preserveKey = false): array
 function collect(array $array, callable $fn): array {
     $chunks = [];
     foreach ($array as $key => $value) {
-        $chunks[] = iterator_to_array(Util::assertTraversable($fn($value, $key)));
+        $chunks[] = iterator_to_array(Util::assertIterable($fn($value, $key)));
     }
     return flatten($chunks);
 }
@@ -98,8 +98,13 @@ function each(array $array, callable $fn): array
 
 function eachSpread(array $array, callable $fn): array
 {
+    /**
+     * @noRector Rector\Php71\Rector\FuncCall\RemoveExtraParametersRector
+     * @see This is a false-positive, see https://github.com/rectorphp/rector/issues/2490
+     */
     return each($array, static function (array $chunk, $key) use ($fn) {
         $chunk[] = $key;
+
         return $fn(...$chunk);
     });
 }
@@ -154,6 +159,7 @@ function flip(array $array): array
  */
 function groupBy(array $array, $groupBy, bool $preserveKey = false): array
 {
+    $nextGroups = [];
     if (is_array($groupBy)) {
         $nextGroups = $groupBy;
         $groupBy = array_shift($nextGroups);
@@ -247,7 +253,7 @@ function mapWithKeys(array $array, callable $fn): array
 {
     $result = [];
     foreach ($array as $key => $value) {
-        foreach (Util::assertTraversable($fn($value, $key)) as $mapKey => $mapValue) {
+        foreach (Util::assertIterable($fn($value, $key)) as $mapKey => $mapValue) {
             $result[$mapKey] = $mapValue;
         }
     }
