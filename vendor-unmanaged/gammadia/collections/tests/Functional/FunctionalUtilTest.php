@@ -6,7 +6,7 @@ use Gammadia\Collections\Functional\Util;
 use PHPUnit\Framework\TestCase;
 use UnexpectedValueException;
 
-class FunctionalUtilTest extends TestCase
+final class FunctionalUtilTest extends TestCase
 {
     public function test_assertTraversable()
     {

@@ -19,7 +19,7 @@ use function Gammadia\Collections\Functional\map;
 use function Gammadia\Collections\Functional\tail;
 use function Gammadia\Collections\Functional\values;
 
-class FunctionalTest extends TestCase
+final class FunctionalTest extends TestCase
 {
     public function test_chunk(): void
     {
@@ -168,10 +168,7 @@ class FunctionalTest extends TestCase
         $extractB = function ($item) { return $item->b; };
         $extractC = function ($item) { return $item->c; };
 
-        self::assertEquals(
-            [10 => [$a, $b, $c], 20 => [$d, $e]],
-            groupBy($data, $extractA)
-        );
+        self::assertEquals([10 => [$a, $b, $c], 20 => [$d, $e]], groupBy($data, $extractA));
 
         self::assertEquals(
             [10 => ['a' => $a, 'b' => $b, 'c' => $c], 20 => ['d' => $d, 'e' => $e]],
@@ -188,10 +185,7 @@ class FunctionalTest extends TestCase
             groupBy($data, [$extractA, $extractB], true)
         );
 
-        self::assertEquals(
-            [1 => [$a, $b, $e], 2 => [$a, $c, $e], 3 => [$a]],
-            groupBy($data, $extractC)
-        );
+        self::assertEquals([1 => [$a, $b, $e], 2 => [$a, $c, $e], 3 => [$a]], groupBy($data, $extractC));
     }
 
     public function test_init(): void
