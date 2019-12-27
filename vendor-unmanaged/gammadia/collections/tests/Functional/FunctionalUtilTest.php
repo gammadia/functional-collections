@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gammadia\Collections\Test\Unit\Functional;
 
 use Gammadia\Collections\Functional\Util;
