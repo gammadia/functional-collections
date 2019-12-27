@@ -133,7 +133,13 @@ function fillWith(array $array, int $start, int $num, callable $generator): arra
 
 function filter(array $array, ?callable $predicate = null): array
 {
-    return array_filter($array, $predicate, ARRAY_FILTER_USE_BOTH);
+    // We cannot call array_filter with "null" as the callback, otherwise it results in this error :
+    // TypeError: array_filter() expects parameter 2 to be a valid callback, no array or string given
+    if (null !== $predicate) {
+        return array_filter($array, $predicate, ARRAY_FILTER_USE_BOTH);
+    }
+
+    return array_filter($array);
 }
 
 function first(array $array)
