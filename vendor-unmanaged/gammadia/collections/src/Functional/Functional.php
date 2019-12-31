@@ -56,7 +56,7 @@ function collect(array $array, callable $fn): array {
     return flatten($chunks);
 }
 
-function column(array $array, string $column, string $index = null): array
+function column(array $array, string $column, ?string $index = null): array
 {
     return array_column($array, $column, $index);
 }
@@ -126,9 +126,15 @@ function fillWith(array $array, int $start, int $num, callable $generator): arra
     return $array;
 }
 
-function filter(array $array, callable $predicate = null): array
+function filter(array $array, ?callable $predicate = null): array
 {
-    return array_filter($array, $predicate, ARRAY_FILTER_USE_BOTH);
+    // We cannot call array_filter with "null" as the callback, otherwise it results in this error :
+    // TypeError: array_filter() expects parameter 2 to be a valid callback, no array or string given
+    if (null !== $predicate) {
+        return array_filter($array, $predicate, ARRAY_FILTER_USE_BOTH);
+    }
+
+    return array_filter($array);
 }
 
 function first(array $array)
@@ -274,7 +280,7 @@ function some(array $array, callable $predicate): bool
     return false;
 }
 
-function sort(array $array, callable $comparator = null): array
+function sort(array $array, ?callable $comparator = null): array
 {
     $comparator ? uasort($array, $comparator) : asort($array);
     return $array;
@@ -293,7 +299,7 @@ function tail(array $array): array
     return $array;
 }
 
-function unique(array $array, callable $key = null, bool $strict = false): array
+function unique(array $array, ?callable $key = null, bool $strict = false): array
 {
     $exists = [];
     return array_filter($array, static function ($item) use ($key, $strict, &$exists) {
