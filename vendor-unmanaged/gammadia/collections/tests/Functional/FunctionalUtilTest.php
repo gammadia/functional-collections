@@ -9,14 +9,16 @@ use PHPUnit\Framework\TestCase;
 
 final class FunctionalUtilTest extends TestCase
 {
-    public function test_assertIterable(): void
+    public function testAssertIterable(): void
     {
         $array = [];
-        self::assertEquals($array, Util::assertIterable([]));
+        self::assertSame($array, Util::assertIterable([]));
 
-        $fn = static function () { yield 2; };
+        $fn = static function () {
+            yield 2;
+        };
         $generator = $fn();
-        self::assertEquals($generator, Util::assertIterable($generator));
+        self::assertSame($generator, Util::assertIterable($generator));
 
         $this->expectException(\UnexpectedValueException::class);
         Util::assertIterable(42);

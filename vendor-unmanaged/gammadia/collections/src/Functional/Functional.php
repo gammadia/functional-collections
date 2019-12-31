@@ -48,11 +48,13 @@ function chunk(array $array, int $size, bool $preserveKey = false): array
     return array_chunk($array, $size, $preserveKey);
 }
 
-function collect(array $array, callable $fn): array {
+function collect(array $array, callable $fn): array
+{
     $chunks = [];
     foreach ($array as $key => $value) {
         $chunks[] = iterator_to_array(Util::assertIterable($fn($value, $key)));
     }
+
     return flatten($chunks);
 }
 
@@ -89,10 +91,11 @@ function diffUsing(array $array, array $other, callable $comparator): array
 function each(array $array, callable $fn): array
 {
     foreach ($array as $key => $value) {
-        if ($fn($value, $key) === false) {
+        if (false === $fn($value, $key)) {
             break;
         }
     }
+
     return $array;
 }
 
@@ -100,6 +103,7 @@ function eachSpread(array $array, callable $fn): array
 {
     return each($array, static function (array $chunk, $key) use ($fn) {
         $chunk[] = $key;
+
         return $fn(...$chunk);
     });
 }
@@ -111,6 +115,7 @@ function every(array $array, callable $fn): bool
             return false;
         }
     }
+
     return true;
 }
 
@@ -119,10 +124,12 @@ function fill(int $startIndex, int $num, $defaultValue = null): array
     return array_fill($startIndex, $num, $defaultValue);
 }
 
-function fillWith(array $array, int $start, int $num, callable $generator): array {
+function fillWith(array $array, int $start, int $num, callable $generator): array
+{
     for ($i = 0; $i < $num; ++$i) {
-      $array[$i + $start] = $generator();
+        $array[$i + $start] = $generator();
     }
+
     return $array;
 }
 
@@ -153,10 +160,7 @@ function flip(array $array): array
 }
 
 /**
- * @param array               $array
  * @param callable|callable[] $groupBy
- * @param bool                $preserveKey
- * @return array
  */
 function groupBy(array $array, $groupBy, bool $preserveKey = false): array
 {
@@ -212,6 +216,7 @@ function indexBy(array $array, callable $key): array
     foreach ($array as $item) {
         $indexed[$key($item)] = $item;
     }
+
     return $indexed;
 }
 
@@ -236,6 +241,7 @@ function map(array $array, callable $fn, bool $withKeyArgument = false): array
 {
     if ($withKeyArgument) {
         $keys = array_keys($array);
+
         return array_combine($keys, array_map($fn, $array, $keys));
     }
 
@@ -246,6 +252,7 @@ function mapSpread(array $array, callable $fn): array
 {
     return map($array, static function (array $chunk, $key) use ($fn) {
         $chunk[] = $key;
+
         return $fn(...$chunk);
     }, true);
 }
@@ -258,6 +265,7 @@ function mapWithKeys(array $array, callable $fn): array
             $result[$mapKey] = $mapValue;
         }
     }
+
     return $result;
 }
 
@@ -278,18 +286,21 @@ function some(array $array, callable $predicate): bool
             return true;
         }
     }
+
     return false;
 }
 
 function sort(array $array, ?callable $comparator = null): array
 {
     $comparator ? uasort($array, $comparator) : asort($array);
+
     return $array;
 }
 
 function sortKeys(array $array, int $options = SORT_REGULAR): array
 {
     ksort($array, $options);
+
     return $array;
 }
 
@@ -303,11 +314,16 @@ function tail(array $array): array
 function unique(array $array, ?callable $key = null, bool $strict = false): array
 {
     $exists = [];
+
     return array_filter($array, static function ($item) use ($key, $strict, &$exists) {
-        if (!in_array($id = $key ? $key($item) : $item, $exists, $strict)) {
+        $id = $key ? $key($item) : $item;
+
+        if (!in_array($id, $exists, $strict)) {
             $exists[] = $id;
+
             return true;
         }
+
         return false;
     });
 }

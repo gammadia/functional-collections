@@ -32,7 +32,7 @@ final class UseFunctionalFunctionsPhpStanRule implements Rule
                     'Please <info>use function %s;</info> instead of PHP\'s %s().',
                     $functionsToReplace[$functionName],
                     $functionName
-                )
+                ),
             ];
         }
 
