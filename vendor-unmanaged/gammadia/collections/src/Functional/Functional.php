@@ -98,13 +98,8 @@ function each(array $array, callable $fn): array
 
 function eachSpread(array $array, callable $fn): array
 {
-    /**
-     * @noRector Rector\Php71\Rector\FuncCall\RemoveExtraParametersRector
-     * @see This is a false-positive, see https://github.com/rectorphp/rector/issues/2490
-     */
     return each($array, static function (array $chunk, $key) use ($fn) {
         $chunk[] = $key;
-
         return $fn(...$chunk);
     });
 }
