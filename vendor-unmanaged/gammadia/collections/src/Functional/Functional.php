@@ -78,7 +78,15 @@ function contains(array $array, $item, bool $strict = false): bool
 
 function combine(array $keys, array $values): array
 {
-    return array_combine($keys, $values);
+    $result = array_combine($keys, $values);
+
+    if (false === $result) {
+        throw new \InvalidArgumentException(
+            'The number of elements for each array is not equal or the arrays are empty.'
+        );
+    }
+
+    return $result;
 }
 
 function diff(array $array, array ...$others): array
@@ -169,7 +177,7 @@ function flip(array $array): array
 }
 
 /**
- * @param callable|callable[] $groupBy
+ * @param mixed $groupBy This is a callable or an array of callable. Can't manage to describe it in the PHPDoc.
  */
 function groupBy(array $array, $groupBy, bool $preserveKey = false): array
 {
@@ -177,6 +185,10 @@ function groupBy(array $array, $groupBy, bool $preserveKey = false): array
     if (is_array($groupBy)) {
         $nextGroups = $groupBy;
         $groupBy = array_shift($nextGroups);
+    }
+
+    if (!is_callable($groupBy)) {
+        throw new \InvalidArgumentException('The $groupBy argument must be a callable or an array of callables.');
     }
 
     $results = [];
@@ -252,9 +264,9 @@ function last(array $array)
 function map(array $array, callable $fn, bool $withKeyArgument = false): array
 {
     if ($withKeyArgument) {
-        $keys = array_keys($array);
+        $keys = keys($array);
 
-        return array_combine($keys, array_map($fn, $array, $keys));
+        return combine($keys, array_map($fn, $array, $keys));
     }
 
     return array_map($fn, $array);
