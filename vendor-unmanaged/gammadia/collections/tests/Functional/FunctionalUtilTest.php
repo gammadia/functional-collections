@@ -12,7 +12,7 @@ final class FunctionalUtilTest extends TestCase
     public function testAssertIterable(): void
     {
         $array = [];
-        self::assertSame($array, Util::assertIterable([]));
+        self::assertSame($array, Util::assertIterable($array));
 
         $fn = static function () {
             yield 2;

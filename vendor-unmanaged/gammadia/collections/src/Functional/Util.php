@@ -6,6 +6,11 @@ namespace Gammadia\Collections\Functional;
 
 final class Util
 {
+    /**
+     * @param mixed $traversable
+     *
+     * @return mixed
+     */
     public static function assertIterable($traversable)
     {
         if (is_iterable($traversable)) {

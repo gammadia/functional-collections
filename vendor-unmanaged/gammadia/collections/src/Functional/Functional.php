@@ -68,6 +68,9 @@ function concat(array ...$arrays): array
     return array_merge([], ...$arrays);
 }
 
+/**
+ * @param mixed $item
+ */
 function contains(array $array, $item, bool $strict = false): bool
 {
     return in_array($item, $array, $strict);
@@ -119,6 +122,9 @@ function every(array $array, callable $fn): bool
     return true;
 }
 
+/**
+ * @param mixed|null $defaultValue
+ */
 function fill(int $startIndex, int $num, $defaultValue = null): array
 {
     return array_fill($startIndex, $num, $defaultValue);
@@ -144,6 +150,9 @@ function filter(array $array, ?callable $predicate = null): array
     return array_filter($array);
 }
 
+/**
+ * @return mixed|null
+ */
 function first(array $array)
 {
     return empty($array) ? null : $array[array_key_first($array)];
@@ -232,6 +241,9 @@ function keys(array $array): array
     return array_keys($array);
 }
 
+/**
+ * @return mixed|null
+ */
 function last(array $array)
 {
     return empty($array) ? null : $array[array_key_last($array)];
@@ -269,6 +281,11 @@ function mapWithKeys(array $array, callable $fn): array
     return $result;
 }
 
+/**
+ * @param mixed $initial
+ *
+ * @return mixed
+ */
 function reduce(array $array, callable $reducer, $initial = null)
 {
     return array_reduce($array, $reducer, $initial);
