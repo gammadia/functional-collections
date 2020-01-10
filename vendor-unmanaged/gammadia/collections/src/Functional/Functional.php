@@ -29,10 +29,6 @@ const FUNCTIONS_REPLACEMENTS_MAP = [
     'array_map' => __NAMESPACE__ . '\\map',
     'array_reduce' => __NAMESPACE__ . '\\reduce',
     'array_reverse' => __NAMESPACE__ . '\\reverse',
-    'sort' => __NAMESPACE__ . '\\sort',
-    'asort' => __NAMESPACE__ . '\\sort',
-    'uasort' => __NAMESPACE__ . '\\sort',
-    'ksort' => __NAMESPACE__ . '\\sortKeys',
     'array_shift' => __NAMESPACE__ . '\\tail',
     'array_unique' => __NAMESPACE__ . '\\unique',
     'array_values' => __NAMESPACE__ . '\\values',
@@ -319,20 +315,6 @@ function some(array $array, callable $predicate): bool
     }
 
     return false;
-}
-
-function sort(array $array, ?callable $comparator = null): array
-{
-    $comparator ? uasort($array, $comparator) : asort($array);
-
-    return $array;
-}
-
-function sortKeys(array $array, int $options = SORT_REGULAR): array
-{
-    ksort($array, $options);
-
-    return $array;
 }
 
 function tail(array $array): array
