@@ -48,7 +48,7 @@ final class UtilTest extends TestCase
     }
 
     /**
-     * @return iterable<mixed>
+     * @return iterable<int[]>
      */
     public function invalidIterable(): iterable
     {
@@ -56,7 +56,7 @@ final class UtilTest extends TestCase
     }
 
     /**
-     * @param \Traversable<mixed> $traversable
+     * @param Traversable<mixed> $traversable
      *
      * @dataProvider traversable
      */
