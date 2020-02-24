@@ -36,13 +36,13 @@ final class FunctionalTest extends TestCase
     {
         $data = [1, 2, 3, 4, 5];
 
-        self::assertSame([4, 8], collect($data, function ($v) {
+        self::assertSame([4, 8], collect($data, function ($v): iterable {
             if (0 === $v % 2) {
                 yield $v * 2;
             }
         }));
 
-        self::assertSame([1, 2, 3, 6, 5, 10], collect($data, function ($v, $k) {
+        self::assertSame([1, 2, 3, 6, 5, 10], collect($data, function ($v, $k): iterable {
             if (0 === $k % 2) {
                 yield $v;
                 yield $v * 2;
@@ -51,7 +51,7 @@ final class FunctionalTest extends TestCase
 
         $data = ['Alex', 'Aude', 'Bob', 'Claire', 'Daniel'];
 
-        self::assertSame(['A' => 'Aude', 'B' => 'Bob'], collect($data, function ($name) {
+        self::assertSame(['A' => 'Aude', 'B' => 'Bob'], collect($data, function ($name): iterable {
             if (strlen($name) <= 4) {
                 yield $name[0] => $name;
             }
@@ -104,7 +104,7 @@ final class FunctionalTest extends TestCase
 
         self::assertSame(
             [['id' => 1], 2 => ['id' => 3]],
-            diffUsing($data, [['id' => 2]], function ($a, $b) {
+            diffUsing($data, [['id' => 2]], function ($a, $b): int {
                 return $a['id'] <=> $b['id'];
             })
         );
@@ -113,7 +113,7 @@ final class FunctionalTest extends TestCase
     public function testEach(): void
     {
         $calls = [];
-        $cb = function ($value, $key) use (&$calls) {
+        $cb = function ($value, $key) use (&$calls): bool {
             $calls[] = func_get_args();
 
             return 2 !== $value;
@@ -139,7 +139,7 @@ final class FunctionalTest extends TestCase
         eachSpread($data, $cb);
 
         self::assertSame(
-            values(map($data, function ($items, $key) {
+            values(map($data, function ($items, $key): array {
                 return concat($items, [$key]);
             }, true)),
             $calls
@@ -149,7 +149,7 @@ final class FunctionalTest extends TestCase
     public function testEvery(): void
     {
         $count = 0;
-        $cb = function ($value, $key) use (&$count) {
+        $cb = function ($value, $key) use (&$count): bool {
             ++$count;
 
             return $key < 3 && $value < 10;

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Gammadia\Collections\Functional;
 
+use InvalidArgumentException;
+
 const FUNCTIONS_REPLACEMENTS_MAP = [
     'array_chunk' => __NAMESPACE__ . '\\chunk',
     'array_column' => __NAMESPACE__ . '\\column',
@@ -48,7 +50,7 @@ function collect(array $array, callable $fn): array
 {
     $chunks = [];
     foreach ($array as $key => $value) {
-        $chunks[] = iterator_to_array(Util::assertIterable($fn($value, $key)));
+        $chunks[] = iterator_to_array(Util::assertTraversable($fn($value, $key)));
     }
 
     return flatten($chunks);
@@ -77,7 +79,7 @@ function combine(array $keys, array $values): array
     $result = array_combine($keys, $values);
 
     if (false === $result) {
-        throw new \InvalidArgumentException(
+        throw new InvalidArgumentException(
             'The number of elements for each array is not equal or the arrays are empty.'
         );
     }
@@ -184,7 +186,7 @@ function groupBy(array $array, $groupBy, bool $preserveKey = false): array
     }
 
     if (!is_callable($groupBy)) {
-        throw new \InvalidArgumentException('The $groupBy argument must be a callable or an array of callables.');
+        throw new InvalidArgumentException('The $groupBy argument must be a callable or an array of callables.');
     }
 
     $results = [];
@@ -204,7 +206,7 @@ function groupBy(array $array, $groupBy, bool $preserveKey = false): array
     }
 
     if (!empty($nextGroups)) {
-        return map($results, static function ($group) use ($preserveKey, $nextGroups) {
+        return map($results, static function ($group) use ($preserveKey, $nextGroups): array {
             return groupBy($group, $nextGroups, $preserveKey);
         });
     }
@@ -326,7 +328,7 @@ function unique(array $array, ?callable $key = null, bool $strict = false): arra
 {
     $exists = [];
 
-    return array_filter($array, static function ($item) use ($key, $strict, &$exists) {
+    return array_filter($array, static function ($item) use ($key, $strict, &$exists): bool {
         $id = $key ? $key($item) : $item;
 
         if (!in_array($id, $exists, $strict)) {
