@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Gammadia\Collections\Functional;
 
 use InvalidArgumentException;
+use Webmozart\Assert\Assert;
 
 const FUNCTIONS_REPLACEMENTS_MAP = [
     'array_chunk' => __NAMESPACE__ . '\\chunk',
@@ -117,10 +118,10 @@ function eachSpread(array $array, callable $fn): array
     });
 }
 
-function every(array $array, callable $fn): bool
+function every(array $array, callable $predicate): bool
 {
     foreach ($array as $key => $value) {
-        if (!$fn($value, $key)) {
+        if (!$predicate($value, $key)) {
             return false;
         }
     }
@@ -166,7 +167,7 @@ function first(array $array)
 
 function flatten(array $arrays): array
 {
-    return array_merge([], ...$arrays);
+    return array_merge([], ...values($arrays));
 }
 
 function flip(array $array): array
@@ -306,10 +307,10 @@ function reverse(array $array, bool $preserveKey = false): array
     return array_reverse($array, $preserveKey);
 }
 
-function some(array $array, callable $predicate): bool
+function some(array $array, ?callable $predicate = null): bool
 {
     foreach ($array as $item) {
-        if ($predicate($item)) {
+        if (null === $predicate ? (bool) $item : $predicate($item)) {
             return true;
         }
     }
@@ -344,6 +345,20 @@ function unique(array $array, ?callable $key = null, bool $strict = false): arra
 function values(array $array): array
 {
     return array_values($array);
+}
+
+function window(array $array, int $width): array
+{
+    $count = count($array);
+    Assert::notEq($width, 0);
+    Assert::lessThanEq($width, $count, 'Not enough items in array');
+
+    $windows = [];
+    for ($i = 0; ($i + $width - 1) < $count; ++$i) {
+        $windows[] = array_slice($array, $i, $width);
+    }
+
+    return $windows;
 }
 
 function zip(array ...$arrays): array
