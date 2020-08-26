@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Gammadia\Collections\Functional;
 
 use InvalidArgumentException;
+use Closure;
 
 const FUNCTIONS_REPLACEMENTS_MAP = [
     'array_chunk' => __NAMESPACE__ . '\\chunk',
@@ -322,6 +323,17 @@ function tail(array $array): array
     array_shift($array);
 
     return $array;
+}
+
+function exists(array $array, Closure $p): bool
+{
+    foreach ($array as $key => $element) {
+        if ($p($key, $element)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 function unique(array $array, ?callable $key = null, bool $strict = false): array
