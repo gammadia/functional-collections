@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Gammadia\Collections\Functional;
 
 use InvalidArgumentException;
-use Closure;
 
 const FUNCTIONS_REPLACEMENTS_MAP = [
     'array_chunk' => __NAMESPACE__ . '\\chunk',
