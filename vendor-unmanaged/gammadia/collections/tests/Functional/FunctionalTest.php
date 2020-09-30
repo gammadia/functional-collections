@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Gammadia\Collections\Test\Unit\Functional;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use function Gammadia\Collections\Functional\chunk;
 use function Gammadia\Collections\Functional\collect;
@@ -20,6 +21,7 @@ use function Gammadia\Collections\Functional\init;
 use function Gammadia\Collections\Functional\map;
 use function Gammadia\Collections\Functional\tail;
 use function Gammadia\Collections\Functional\values;
+use function Gammadia\Collections\Functional\window;
 
 final class FunctionalTest extends TestCase
 {
@@ -218,5 +220,31 @@ final class FunctionalTest extends TestCase
 
         self::assertSame($output, tail($input));
         self::assertSame([], tail([]));
+    }
+
+    public function testWindow(): void
+    {
+        $input = ['first', 'second', 'third', 'fourth', 'fifth'];
+
+        $output = [['first'], ['second'], ['third'], ['fourth'], ['fifth']];
+        self::assertSame($output, window($input, 1));
+
+        $output = [['first', 'second'], ['second', 'third'], ['third', 'fourth'], ['fourth', 'fifth']];
+        self::assertSame($output, window($input, 2));
+
+        $output = [['first', 'second', 'third'], ['second', 'third', 'fourth'], ['third', 'fourth', 'fifth']];
+        self::assertSame($output, window($input, 3));
+
+        // This would make no sense whatsoever
+        $this->expectException(InvalidArgumentException::class);
+        window($input, 0);
+    }
+
+    public function testWindowOutsideOfRange(): void
+    {
+        $input = ['first', 'second'];
+
+        $this->expectException(InvalidArgumentException::class);
+        window($input, 4);
     }
 }
