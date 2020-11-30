@@ -297,8 +297,16 @@ function mapWithKeys(array $array, callable $fn): array
  *
  * @return mixed
  */
-function reduce(array $array, callable $reducer, $initial = null)
+function reduce(array $array, callable $reducer, $initial = null, bool $withKeyArgument = false)
 {
+    if ($withKeyArgument) {
+        return array_reduce(keys($array), static function ($carry, $key) use ($reducer, $array) {
+            $carry = $reducer($carry, $array[$key], $key);
+
+            return $carry;
+        }, $initial);
+    }
+
     return array_reduce($array, $reducer, $initial);
 }
 
