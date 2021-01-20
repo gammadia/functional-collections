@@ -96,6 +96,15 @@ abstract class Optional
         return $this->none ? $otherValue : $this->value;
     }
 
+    public function ifPresent(callable $fn): void
+    {
+        if ($this->isNone()) {
+            return;
+        }
+
+        $fn($this->value());
+    }
+
     /**
      * @param self<T> $other
      */
