@@ -6,6 +6,7 @@ namespace Gammadia\Collections\Test\Unit\Functional;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use function Gammadia\Collections\Functional\all;
 use function Gammadia\Collections\Functional\chunk;
 use function Gammadia\Collections\Functional\collect;
 use function Gammadia\Collections\Functional\column;
@@ -25,6 +26,29 @@ use function Gammadia\Collections\Functional\window;
 
 final class FunctionalTest extends TestCase
 {
+    public function testAll(): void
+    {
+        self::assertTrue(all([true]));
+        self::assertTrue(all([true, true, true]));
+
+        // This one demonstrates a custom function
+        self::assertTrue(all([42, '42', '42.1337', 42.1337, '0.0'], static function ($value): bool {
+            return is_numeric($value);
+        }));
+
+        // These are cases you would expect to be false
+        self::assertFalse(all([true, false, true]));
+        self::assertFalse(all([true, null, true]));
+        self::assertFalse(all([true, 0, true]));
+        self::assertFalse(all([true, 0.0, true]));
+        self::assertFalse(all([true, '0', true]));
+        self::assertFalse(all([true, [], true]));
+        self::assertFalse(all([false]));
+
+        // Beware, some are trickier than you think, like PHP interpreting "0.0" as true
+        self::assertTrue(all([true, '0.0', true]));
+    }
+
     public function testChunk(): void
     {
         $data = [1, 2, 3, 4];
