@@ -42,6 +42,18 @@ const FUNCTIONS_REPLACEMENTS_MAP = [
  * for inspiration
 */
 
+function all(array $array, ?callable $predicate = null): bool
+{
+    foreach ($array as $item) {
+        $result = null === $predicate ? (bool) $item : $predicate($item);
+        if (!$result) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 function chunk(array $array, int $size, bool $preserveKey = false): array
 {
     return array_chunk($array, $size, $preserveKey);
