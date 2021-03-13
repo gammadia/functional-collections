@@ -16,6 +16,7 @@ use Generator;
 /**
  * @template K
  * @template T
+ *
  * @param iterable<K, T> $stream
  * @param callable(T, K): bool $predicate
  */
@@ -35,6 +36,7 @@ function sall(iterable $stream, callable $predicate): bool
  * @template T
  * @template L
  * @template U
+ *
  * @param iterable<K, T> $stream
  * @param callable(T, K): Generator<L, U> $fn
  *
@@ -50,6 +52,7 @@ function scollect(iterable $stream, callable $fn): Generator
 /**
  * @template K
  * @template T
+ *
  * @param iterable<K, T> ...$streams
  *
  * @return Generator<K, T>
@@ -61,6 +64,7 @@ function sconcat(iterable ...$streams): Generator
 
 /**
  * @template T
+ *
  * @param iterable<T> $stream
  * @param T $item
  */
@@ -79,6 +83,7 @@ function scontains(iterable $stream, $item, bool $strict = false): bool
 /**
  * @template K
  * @template T
+ *
  * @param iterable<K, T> $stream
  * @param (callable(T, K): bool)|null $predicate
  *
@@ -95,6 +100,7 @@ function sfilter(iterable $stream, ?callable $predicate = null): Generator
 
 /**
  * @template T
+ *
  * @param iterable<T> $stream
  *
  * @return T|null
@@ -112,6 +118,7 @@ function sfirst(iterable $stream)
 /**
  * @template K
  * @template T
+ *
  * @param iterable<iterable<T>> $streams
  *
  * @return Generator<T>
@@ -126,6 +133,7 @@ function sflatten(iterable $streams): Generator
 /**
  * @template K
  * @template T
+ *
  * @param iterable<K, T> $stream
  *
  * @return Generator<K>
@@ -140,6 +148,7 @@ function skeys(iterable $stream): Generator
 /**
  * @template K
  * @template T
+ *
  * @param iterable<K, T> $stream
  *
  * @return T|null
@@ -176,6 +185,7 @@ function smap(iterable $stream, callable $fn): Generator
  * @template K
  * @template T
  * @template U
+ *
  * @param iterable<K, T> $stream
  * @param callable(U, T, K): U $reducer
  * @param U $carry
@@ -194,10 +204,9 @@ function sreduce(iterable $stream, callable $reducer, $carry)
 /**
  * @template K
  * @template T
+ *
  * @param iterable<K, T> $stream
  * @param callable(T, K): bool|null $predicate
- *
- * @return bool
  */
 function ssome(iterable $stream, ?callable $predicate = null): bool
 {
@@ -213,8 +222,8 @@ function ssome(iterable $stream, ?callable $predicate = null): bool
 /**
  * @template K
  * @template T
+ *
  * @param iterable<K, T> $stream
- * @param int $n
  *
  * @return Generator<K, T>
  */
@@ -222,7 +231,7 @@ function soffset(iterable $stream, int $n): Generator
 {
     foreach ($stream as $key => $value) {
         if ($n > 0) {
-            $n -= 1;
+            --$n;
         } else {
             yield $key => $value;
         }
@@ -232,6 +241,7 @@ function soffset(iterable $stream, int $n): Generator
 /**
  * @template K
  * @template T
+ *
  * @param iterable<K, T> $stream
  * @param (callable(T, K): mixed)|null $key
  *
@@ -253,6 +263,7 @@ function sunique(iterable $stream, ?callable $key = null, bool $strict = false):
 /**
  * @template K
  * @template T
+ *
  * @param iterable<K, T> $stream
  *
  * @return Generator<int, T>
