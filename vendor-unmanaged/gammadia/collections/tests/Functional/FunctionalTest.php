@@ -10,17 +10,29 @@ use function Gammadia\Collections\Functional\all;
 use function Gammadia\Collections\Functional\chunk;
 use function Gammadia\Collections\Functional\collect;
 use function Gammadia\Collections\Functional\column;
+use function Gammadia\Collections\Functional\combine;
 use function Gammadia\Collections\Functional\concat;
 use function Gammadia\Collections\Functional\contains;
 use function Gammadia\Collections\Functional\diff;
 use function Gammadia\Collections\Functional\diffUsing;
 use function Gammadia\Collections\Functional\each;
 use function Gammadia\Collections\Functional\eachSpread;
-use function Gammadia\Collections\Functional\every;
+use function Gammadia\Collections\Functional\fill;
+use function Gammadia\Collections\Functional\fillWith;
+use function Gammadia\Collections\Functional\filter;
+use function Gammadia\Collections\Functional\first;
+use function Gammadia\Collections\Functional\flatten;
+use function Gammadia\Collections\Functional\flip;
 use function Gammadia\Collections\Functional\groupBy;
+use function Gammadia\Collections\Functional\indexBy;
 use function Gammadia\Collections\Functional\init;
+use function Gammadia\Collections\Functional\keys;
+use function Gammadia\Collections\Functional\last;
 use function Gammadia\Collections\Functional\map;
+use function Gammadia\Collections\Functional\reduce;
+use function Gammadia\Collections\Functional\some;
 use function Gammadia\Collections\Functional\tail;
+use function Gammadia\Collections\Functional\unique;
 use function Gammadia\Collections\Functional\values;
 use function Gammadia\Collections\Functional\window;
 
@@ -114,6 +126,12 @@ final class FunctionalTest extends TestCase
         self::assertFalse(contains([1, 2, 3], 4));
     }
 
+    public function testCombine(): void
+    {
+        self::assertSame([1 => 'test1', 2 => 'test2'], combine([1, 2], ['test1', 'test2']));
+        self::assertSame(['test1' => 1, 'test2' => 2], combine(['test1', 'test2'], [1, 2]));
+    }
+
     public function testDiff(): void
     {
         self::assertSame([1, 2], diff([1, 2, 3, 4], [3], [4, 5]));
@@ -172,20 +190,54 @@ final class FunctionalTest extends TestCase
         );
     }
 
-    public function testEvery(): void
+    public function testFill(): void
     {
-        $count = 0;
-        $cb = function ($value, $key) use (&$count): bool {
-            ++$count;
+        self::assertSame([null, null, null], fill(0, 3));
+        self::assertSame([42, 42, 42], fill(0, 3, 42));
+        self::assertSame([1 => null, 2 => null], fill(1, 2));
+    }
 
-            return $key < 3 && $value < 10;
+    public function testFillWith(): void
+    {
+        $callable = static function (): int {
+            return 42;
         };
+        self::assertSame([42, 42, 42], fillWith([], 0, 3, $callable));
+        self::assertSame([42, 42, 42], fillWith([13, 37, 42], 0, 3, $callable));
+    }
 
-        self::assertTrue(every([1, 2, 3], $cb));
-        self::assertFalse(every([1, 2, 3, 4, 5], $cb));
-        self::assertFalse(every([0, 10, 20], $cb));
+    public function testFilter(): void
+    {
+        // These are cases you would expect to be false
+        self::assertSame([], filter([null, 0, false, '0', []]));
 
-        self::assertSame(9, $count);
+        // Beware, some are trickier than you think, like PHP interpreting "0.0" as true
+        self::assertSame(['0.0'], filter(['0.0']));
+
+        // With a custom callback
+        self::assertSame([2, 4], values(filter(range(1, 5), static function (int $v): bool {
+            return 0 === $v % 2;
+        })));
+    }
+
+    public function testFirst(): void
+    {
+        self::assertSame(1, first([1, 2, 3]));
+        self::assertSame(1, first(['test1' => 1, 'test2' => 2]));
+        self::assertSame(['test1'], first([['test1'], ['test2']]));
+    }
+
+    public function testFlatten(): void
+    {
+        self::assertSame([1, 2, 3], flatten([[1], [2], [3]]));
+        self::assertSame([1, 2, 3], flatten([[1], [2, 3]]));
+        self::assertSame([1, 2, [3]], flatten([[1], [2, [3]]]));
+    }
+
+    public function testFlip(): void
+    {
+        self::assertSame(['test1' => 1, 'test2' => 2], flip([1 => 'test1', 2 => 'test2']));
+        self::assertSame([1 => 'test1', 2 => 'test2'], flip(['test1' => 1, 'test2' => 2]));
     }
 
     public function testGroupBy(): void
@@ -228,6 +280,28 @@ final class FunctionalTest extends TestCase
         self::assertSame([1 => [$a, $b, $e], 2 => [$a, $c, $e], 3 => [$a]], groupBy($data, $extractC));
     }
 
+    public function testIntersect(): void
+    {
+        self::markTestIncomplete('@todo Implement this');
+    }
+
+    public function testIntersectUsing(): void
+    {
+        self::markTestIncomplete('@todo Implement this');
+    }
+
+    public function testIntersectKeys(): void
+    {
+        self::markTestIncomplete('@todo Implement this');
+    }
+
+    public function testIndexBy(): void
+    {
+        self::assertSame([1 => 2, 2 => 4], indexBy([2, 4], static function (int $v): int {
+            return $v / 2;
+        }));
+    }
+
     public function testInit(): void
     {
         $input = ['first', 'second', 'third'];
@@ -237,6 +311,82 @@ final class FunctionalTest extends TestCase
         self::assertSame([], init([]));
     }
 
+    public function testKeys(): void
+    {
+        self::assertSame([0, 1, 2], keys([1, 2, 3]));
+        self::assertSame([1, 2, 3], keys([1 => 1, 2 => 2, 3 => 3]));
+        self::assertSame([0, 1, 'key', 2], keys([1, 2, 'key' => 'value', 3]));
+
+        // PHP will convert numeric-string to int internally
+        self::assertSame([1, 2, 3], keys(['1' => 1, '2' => 2, '3' => 3]));
+    }
+
+    public function testLast(): void
+    {
+        self::assertSame(3, last([1, 2, 3]));
+        self::assertSame(2, last(['test1' => 1, 'test2' => 2]));
+        self::assertSame(['test2'], last([['test1'], ['test2']]));
+    }
+
+    public function testMap(): void
+    {
+        self::assertSame([2, 4], map([1, 2], static function (int $v): int {
+            return $v * 2;
+        }));
+        self::assertSame([false, true], map([0, 1], static function (int $v): bool {
+            return (bool) $v;
+        }));
+    }
+
+    public function testMapSpread(): void
+    {
+        self::markTestIncomplete('@todo Implement this');
+    }
+
+    public function testMapWithKeys(): void
+    {
+        self::markTestIncomplete('@todo Implement this');
+    }
+
+    public function testReduce(): void
+    {
+        self::assertNull(reduce([], static function (): void {
+        }));
+        self::assertSame(
+            6,
+            reduce([1, 2, 3], static function (int $carry, int $value): int {
+                return $carry + $value;
+            }, 0)
+        );
+        self::assertSame(
+            '123',
+            reduce([1, 2, 3], static function (string $carry, int $value): string {
+                return $carry . $value;
+            }, '')
+        );
+    }
+
+    public function testReverse(): void
+    {
+        self::markTestIncomplete('@todo Implement this');
+    }
+
+    public function testSome(): void
+    {
+        // These are cases you would expect to be false
+        self::assertFalse(some([null, 0, false, '0', []]));
+
+        // Beware, some are trickier than you think, like PHP interpreting "0.0" as true
+        self::assertTrue(some(['0.0']));
+
+        // With a custom callback
+        $isEven = static function (int $v): bool {
+            return 0 === $v % 2;
+        };
+        self::assertTrue(some(range(1, 5), $isEven));
+        self::assertFalse(some([1, 3, 5], $isEven));
+    }
+
     public function testTail(): void
     {
         $input = ['first', 'second', 'third'];
@@ -244,6 +394,43 @@ final class FunctionalTest extends TestCase
 
         self::assertSame($output, tail($input));
         self::assertSame([], tail([]));
+    }
+
+    public function testUnique(): void
+    {
+        self::assertSame([1], unique([1, 1, 1]));
+
+        // Strictness test
+        self::assertSame([1], unique([1, '1', 1]));
+        self::assertSame([1, '1'], unique([1, '1', 1], null, true));
+
+        // Keys are preserved
+        self::assertSame([0 => 1, 2 => 3, 4 => 2], unique([1, 1, 3, 1, 2, 1]));
+
+        // Custom callable
+        $name = static function (array $data): string {
+            return $data['name'];
+        };
+        self::assertSame(
+            [0 => ['id' => 1, 'name' => 'John'], 2 => ['id' => 3, 'name' => 'Paul']],
+            unique(
+                [
+                    ['id' => 1, 'name' => 'John'],
+                    ['id' => 2, 'name' => 'John'],
+                    ['id' => 3, 'name' => 'Paul'],
+                    ['id' => 4, 'name' => 'John'],
+                    ['id' => 5, 'name' => 'Paul'],
+                ],
+                $name
+            )
+        );
+    }
+
+    public function testValues(): void
+    {
+        self::assertSame([1, 2, 3], values([1, 2, 3]));
+        self::assertSame([1, 2, 3], values([1 => 1, 2 => 2, 3 => 3]));
+        self::assertSame([1, 2, 'value', 3], values([1, 2, 'key' => 'value', 3]));
     }
 
     public function testWindow(): void
@@ -270,5 +457,10 @@ final class FunctionalTest extends TestCase
 
         $this->expectException(InvalidArgumentException::class);
         window($input, 4);
+    }
+
+    public function testZip(): void
+    {
+        self::markTestIncomplete('@todo Implement this');
     }
 }

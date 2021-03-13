@@ -18,12 +18,13 @@ use Generator;
  * @template T
  *
  * @param iterable<K, T> $stream
- * @param callable(T, K): bool $predicate
+ * @param (callable(T, K): bool)|null $predicate
  */
-function sall(iterable $stream, callable $predicate): bool
+function sall(iterable $stream, ?callable $predicate = null): bool
 {
     foreach ($stream as $key => $value) {
-        if (!$predicate($value, $key)) {
+        $result = null === $predicate ? (bool) $value : $predicate($value, $key);
+        if (!$result) {
             return false;
         }
     }
