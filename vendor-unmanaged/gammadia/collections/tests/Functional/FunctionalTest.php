@@ -16,7 +16,6 @@ use function Gammadia\Collections\Functional\diff;
 use function Gammadia\Collections\Functional\diffUsing;
 use function Gammadia\Collections\Functional\each;
 use function Gammadia\Collections\Functional\eachSpread;
-use function Gammadia\Collections\Functional\every;
 use function Gammadia\Collections\Functional\groupBy;
 use function Gammadia\Collections\Functional\init;
 use function Gammadia\Collections\Functional\map;
@@ -170,22 +169,6 @@ final class FunctionalTest extends TestCase
             }, true)),
             $calls
         );
-    }
-
-    public function testEvery(): void
-    {
-        $count = 0;
-        $cb = function ($value, $key) use (&$count): bool {
-            ++$count;
-
-            return $key < 3 && $value < 10;
-        };
-
-        self::assertTrue(every([1, 2, 3], $cb));
-        self::assertFalse(every([1, 2, 3, 4, 5], $cb));
-        self::assertFalse(every([0, 10, 20], $cb));
-
-        self::assertSame(9, $count);
     }
 
     public function testGroupBy(): void

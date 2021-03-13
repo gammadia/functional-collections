@@ -130,17 +130,6 @@ function eachSpread(array $array, callable $fn): array
     });
 }
 
-function every(array $array, callable $predicate): bool
-{
-    foreach ($array as $key => $value) {
-        if (!$predicate($value, $key)) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
 /**
  * @param mixed|null $defaultValue
  */
