@@ -106,6 +106,14 @@ final class FunctionalTest extends TestCase
 
         self::assertSame(['A', 'B', 'C'], column($data, 'name'));
         self::assertSame([10 => 'A', 20 => 'B', 30 => 'C'], column($data, 'name', 'id'));
+
+        // Columns can also be accessed by numerical indexes, which is especially useful when using tuples
+        $tuples = [
+            ['A', 42],
+            ['B', 1337],
+        ];
+        self::assertSame(['A', 'B'], column($tuples, 0));
+        self::assertSame([42, 1337], column($tuples, 1));
     }
 
     public function testConcat(): void
