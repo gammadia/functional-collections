@@ -69,7 +69,11 @@ function collect(array $array, callable $fn): array
     return flatten($chunks);
 }
 
-function column(array $array, string $column, ?string $index = null): array
+/**
+ * @param string|int|null $column
+ * @param string|int|null $index
+ */
+function column(array $array, $column, $index = null): array
 {
     return array_column($array, $column, $index);
 }
