@@ -189,7 +189,7 @@ function smap(iterable $stream, callable $fn): Generator
  * @template V
  *
  * @param iterable<K, T> $stream
- * @param callable(U|V, T, K): (U|V) $reducer
+ * @param callable(U|V, T, K): V $reducer
  * @param U $carry
  *
  * @return U|V
