@@ -93,6 +93,7 @@ function contains(array $array, $item, bool $strict = false): bool
 
 function combine(array $keys, array $values): array
 {
+    /** @var mixed[]|false $result */
     $result = array_combine($keys, $values);
 
     if (false === $result) {
