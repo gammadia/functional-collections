@@ -117,7 +117,6 @@ function sfirst(iterable $stream)
 }
 
 /**
- * @template K
  * @template T
  *
  * @param iterable<iterable<T>> $streams
