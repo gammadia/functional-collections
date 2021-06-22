@@ -30,9 +30,9 @@ final class FunctionalStreamTest extends TestCase
         self::assertTrue(sall($this->generator([true, true, true])));
 
         // This one demonstrates a custom function
-        self::assertTrue(sall($this->generator([42, '42', '42.1337', 42.1337, '0.0']), static function ($value): bool {
-            return is_numeric($value);
-        }));
+        self::assertTrue(sall($this->generator([42, '42', '42.1337', 42.1337, '0.0']), static fn ($value): bool
+            => is_numeric($value)
+        ));
 
         // These are cases you would expect to be false
         self::assertFalse(sall($this->generator([true, false, true])));
@@ -119,9 +119,9 @@ final class FunctionalStreamTest extends TestCase
         // With a custom callback
         self::assertSame(
             [2, 4],
-            $this->values(sfilter($this->generator(range(1, 5)), static function (int $v): bool {
-                return 0 === $v % 2;
-            }))
+            $this->values(sfilter($this->generator(range(1, 5)), static fn (int $v): bool
+                => 0 === $v % 2
+            ))
         );
     }
 
@@ -158,15 +158,15 @@ final class FunctionalStreamTest extends TestCase
 
     public function testMap(): void
     {
-        self::assertSame([2, 4], $this->values(smap($this->generator([1, 2]), static function (int $v): int {
-            return $v * 2;
-        })));
-        self::assertSame([0, 1], $this->values(smap($this->generator([2, 4]), static function (int $v, int $k): int {
-            return $k;
-        })));
-        self::assertSame([false, true], $this->values(smap($this->generator([0, 1]), static function (int $v): bool {
-            return (bool) $v;
-        })));
+        self::assertSame([2, 4], $this->values(smap($this->generator([1, 2]), static fn (int $v): int
+            => $v * 2
+        )));
+        self::assertSame([0, 1], $this->values(smap($this->generator([2, 4]), static fn (int $v, int $k): int
+            => $k
+        )));
+        self::assertSame([false, true], $this->values(smap($this->generator([0, 1]), static fn (int $v): bool
+            => (bool) $v
+        )));
     }
 
     public function testOffset(): void
@@ -177,20 +177,13 @@ final class FunctionalStreamTest extends TestCase
 
     public function testReduce(): void
     {
-        self::assertNull(sreduce($this->generator([]), static function (): void {
-        }, null));
-        self::assertSame(
-            6,
-            sreduce($this->generator([1, 2, 3]), static function (int $carry, int $value): int {
-                return $carry + $value;
-            }, 0)
-        );
-        self::assertSame(
-            '123',
-            sreduce($this->generator([1, 2, 3]), static function (string $carry, int $value): string {
-                return $carry . $value;
-            }, '')
-        );
+        self::assertNull(sreduce($this->generator([]), static function (): void {}, null));
+        self::assertSame(6, sreduce($this->generator([1, 2, 3]), static fn (int $carry, int $value): int
+            => $carry + $value
+        , 0));
+        self::assertSame('123', sreduce($this->generator([1, 2, 3]), static fn (string $carry, int $value): string
+            => $carry . $value
+        , ''));
     }
 
     public function testSome(): void
@@ -202,9 +195,7 @@ final class FunctionalStreamTest extends TestCase
         self::assertTrue(ssome($this->generator(['0.0'])));
 
         // With a custom callback
-        $isEven = static function (int $v): bool {
-            return 0 === $v % 2;
-        };
+        $isEven = static fn (int $v): bool => 0 === $v % 2;
         self::assertTrue(ssome($this->generator(range(1, 5)), $isEven));
         self::assertFalse(ssome($this->generator([1, 3, 5]), $isEven));
     }
@@ -221,9 +212,7 @@ final class FunctionalStreamTest extends TestCase
         self::assertSame([0 => 1, 2 => 3, 4 => 2], $this->array(sunique($this->generator([1, 1, 3, 1, 2, 1]))));
 
         // Custom callable
-        $name = static function (array $data): string {
-            return $data['name'];
-        };
+        $name = static fn (array $data): string => $data['name'];
         self::assertSame(
             [0 => ['id' => 1, 'name' => 'John'], 2 => ['id' => 3, 'name' => 'Paul']],
             $this->array(sunique(
