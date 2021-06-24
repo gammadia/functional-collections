@@ -213,9 +213,7 @@ function groupBy(array $array, $groupBy, bool $preserveKey = false): array
     }
 
     if (!empty($nextGroups)) {
-        return map($results, static function ($group) use ($preserveKey, $nextGroups): array {
-            return groupBy($group, $nextGroups, $preserveKey);
-        });
+        return map($results, static fn ($group): array => groupBy($group, $nextGroups, $preserveKey));
     }
 
     return $results;
