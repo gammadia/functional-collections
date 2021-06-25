@@ -1,0 +1,12 @@
+services:
+    -
+        class: Gammadia\Collections\PhpStan\UseFunctionalFunctionsPhpStanRule
+        tags:
+            - phpstan.rules.rule
+
+parameters:
+    ignoreErrors:
+        # There's no sense in checking that we use the Functional functions inside the file that defines them.
+        -   message: '#use function Gammadia\\Collections\\Functional\\#'
+            paths:
+                - 'vendor-unmanaged/gammadia/collections/src/Functional/Functional.php'
