@@ -171,13 +171,13 @@ final class FunctionalStreamTest extends TestCase
 
     public function testOffset(): void
     {
-        self::assertSame([], $this->values(soffset($this->generator([]), 2)));
+        self::assertSame([], $this->values(soffset($this->generator($this->emptyArray()), 2)));
         self::assertSame([3, 4, 5], $this->values(soffset($this->generator(range(1, 5)), 2)));
     }
 
     public function testReduce(): void
     {
-        self::assertNull(sreduce($this->generator([]), static function (): void {}, null));
+        self::assertNull(sreduce($this->generator($this->emptyArray()), static function (): void {}, null));
         self::assertSame(6, sreduce($this->generator([1, 2, 3]), static fn (int $carry, int $value): int
             => $carry + $value
         , 0));
@@ -233,6 +233,15 @@ final class FunctionalStreamTest extends TestCase
         self::assertSame([1, 2, 3], $this->array(svalues($this->generator([1, 2, 3]))));
         self::assertSame([1, 2, 3], $this->array(svalues($this->generator([1 => 1, 2 => 2, 3 => 3]))));
         self::assertSame([1, 2, 'value', 3], $this->array(svalues($this->generator([1, 2, 'key' => 'value', 3]))));
+    }
+
+    /**
+     * @return never[]
+     * @noinspection PhpUndefinedClassInspection
+     */
+    private function emptyArray(): array
+    {
+        return [];
     }
 
     /**
