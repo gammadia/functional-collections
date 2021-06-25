@@ -7,6 +7,8 @@ services:
 parameters:
     ignoreErrors:
         # There's no sense in checking that we use the Functional functions inside the file that defines them.
-        -   message: '#use function Gammadia\\Collections\\Functional\\#'
+        -
+            message: '#use function Gammadia\\Collections\\Functional\\#'
             paths:
-                - 'vendor-unmanaged/gammadia/collections/src/Functional/Functional.php'
+                - '../src/Functional/Functional.php'
+                - '../src/Functional/FunctionalStream.php'
