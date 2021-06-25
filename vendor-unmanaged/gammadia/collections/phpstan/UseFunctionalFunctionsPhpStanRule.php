@@ -2,14 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Gammadia\Collections\Functional;
+namespace Gammadia\Collections\PhpStan;
 
 use PhpParser\Node;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Name;
 use PHPStan\Analyser\Scope;
 use PHPStan\Rules\Rule;
+use Webmozart\Assert\Assert;
+use const Gammadia\Collections\Functional\FUNCTIONS_REPLACEMENTS_MAP;
 
+/**
+ * @implements Rule<FuncCall>
+ */
 final class UseFunctionalFunctionsPhpStanRule implements Rule
 {
     public function getNodeType(): string
@@ -22,6 +27,9 @@ final class UseFunctionalFunctionsPhpStanRule implements Rule
      */
     public function processNode(Node $node, Scope $scope): array
     {
+        /** @var FuncCall $node */
+        Assert::isInstanceOf($node, FuncCall::class);
+
         if (!$node->name instanceof Name) {
             return [];
         }
