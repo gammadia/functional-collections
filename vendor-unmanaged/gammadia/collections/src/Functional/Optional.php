@@ -12,30 +12,19 @@ use Webmozart\Assert\Assert;
 abstract class Optional
 {
     /**
-     * @var T
-     */
-    private $value;
-
-    /**
-     * @var bool
-     */
-    private $none;
-
-    /**
      * @param T $value
      */
-    protected function __construct($value, bool $none)
-    {
-        $this->value = $value;
-        $this->none = $none;
-    }
+    protected function __construct(
+        private mixed $value,
+        private bool $none
+    ) {}
 
     /**
      * @param T $value
      *
      * @return static
      */
-    public static function of($value): self
+    public static function of(mixed $value): self
     {
         /** @phpstan-ignore-next-line */
         return new static($value, false);
@@ -46,7 +35,7 @@ abstract class Optional
      *
      * @return static
      */
-    public static function wrap($value): self
+    public static function wrap(mixed $value): self
     {
         /** @phpstan-ignore-next-line */
         return new static($value, null === $value);
@@ -69,7 +58,7 @@ abstract class Optional
     /**
      * @return T
      */
-    public function value()
+    public function value(): mixed
     {
         Assert::false($this->none, 'You cannot call value() without checking first if there is a value.');
 
@@ -79,7 +68,7 @@ abstract class Optional
     /**
      * @return T|null
      */
-    public function unwrap()
+    public function unwrap(): mixed
     {
         return $this->valueOr(null);
     }
@@ -91,7 +80,7 @@ abstract class Optional
      *
      * @return T|U
      */
-    public function valueOr($otherValue)
+    public function valueOr(mixed $otherValue): mixed
     {
         return $this->none ? $otherValue : $this->value;
     }
@@ -118,5 +107,5 @@ abstract class Optional
      * @param T $a
      * @param T $b
      */
-    abstract protected function areValuesEqual($a, $b): bool;
+    abstract protected function areValuesEqual(mixed $a, mixed $b): bool;
 }

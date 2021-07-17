@@ -12,7 +12,10 @@ use Webmozart\Assert\Assert;
  */
 abstract class Required extends Optional
 {
-    final protected function __construct($value, bool $none)
+    /**
+     * @param T $value
+     */
+    final protected function __construct(mixed $value, bool $none)
     {
         Assert::false($none, 'Please use Optional instead.');
 
