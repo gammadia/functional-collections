@@ -44,7 +44,7 @@ final class FunctionalTest extends TestCase
         self::assertTrue(all([true, true, true]));
 
         // This one demonstrates a custom function
-        self::assertTrue(all([42, '42', '42.1337', 42.1337, '0.0'], static fn ($value): bool
+        self::assertTrue(all([42, '42', '42.1337', 42.1337, '0.0'], static fn (mixed $value): bool
             => is_numeric($value)
         ));
 
@@ -74,13 +74,13 @@ final class FunctionalTest extends TestCase
     {
         $data = [1, 2, 3, 4, 5];
 
-        self::assertSame([4, 8], collect($data, function ($v): iterable {
+        self::assertSame([4, 8], collect($data, function (int $v): iterable {
             if (0 === $v % 2) {
                 yield $v * 2;
             }
         }));
 
-        self::assertSame([1, 2, 3, 6, 5, 10], collect($data, function ($v, $k): iterable {
+        self::assertSame([1, 2, 3, 6, 5, 10], collect($data, function (int $v, int $k): iterable {
             if (0 === $k % 2) {
                 yield $v;
                 yield $v * 2;
@@ -89,7 +89,7 @@ final class FunctionalTest extends TestCase
 
         $data = ['Alex', 'Aude', 'Bob', 'Claire', 'Daniel'];
 
-        self::assertSame(['A' => 'Aude', 'B' => 'Bob'], collect($data, function ($name): iterable {
+        self::assertSame(['A' => 'Aude', 'B' => 'Bob'], collect($data, function (string $name): iterable {
             if (strlen($name) <= 4) {
                 yield $name[0] => $name;
             }
@@ -156,7 +156,7 @@ final class FunctionalTest extends TestCase
 
         self::assertSame(
             [['id' => 1], 2 => ['id' => 3]],
-            diffUsing($data, [['id' => 2]], fn ($a, $b): int
+            diffUsing($data, [['id' => 2]], fn (array $a, array $b): int
                 => $a['id'] <=> $b['id']
             )
         );
@@ -165,7 +165,7 @@ final class FunctionalTest extends TestCase
     public function testEach(): void
     {
         $calls = [];
-        $cb = function ($value, $key) use (&$calls): bool {
+        $cb = function (mixed $value, mixed $key) use (&$calls): bool {
             $calls[] = func_get_args();
 
             return 2 !== $value;
@@ -190,7 +190,7 @@ final class FunctionalTest extends TestCase
 
         eachSpread($data, $cb);
 
-        self::assertSame(values(map($data, fn ($items, $key): array => concat($items, [$key]), true)), $calls);
+        self::assertSame(values(map($data, fn (array $items, mixed $key): array => concat($items, [$key]), true)), $calls);
     }
 
     public function testFill(): void
@@ -251,9 +251,9 @@ final class FunctionalTest extends TestCase
 
         $data = ['a' => $a, 'b' => $b, 'c' => $c, 'd' => $d, 'e' => $e];
 
-        $extractA = fn ($item) => $item->a;
-        $extractB = fn ($item) => $item->b;
-        $extractC = fn ($item) => $item->c;
+        $extractA = fn (mixed $item) => $item->a;
+        $extractB = fn (mixed $item) => $item->b;
+        $extractC = fn (mixed $item) => $item->c;
 
         self::assertSame([10 => [$a, $b, $c], 20 => [$d, $e]], groupBy($data, $extractA));
 

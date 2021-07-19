@@ -69,7 +69,7 @@ function sconcat(iterable ...$streams): Generator
  * @param iterable<T> $stream
  * @param T $item
  */
-function scontains(iterable $stream, $item, bool $strict = false): bool
+function scontains(iterable $stream, mixed $item, bool $strict = false): bool
 {
     foreach ($stream as $value) {
         /** @noinspection TypeUnsafeComparisonInspection */
@@ -106,7 +106,7 @@ function sfilter(iterable $stream, ?callable $predicate = null): Generator
  *
  * @return T|null
  */
-function sfirst(iterable $stream)
+function sfirst(iterable $stream): mixed
 {
     /** @noinspection LoopWhichDoesNotLoopInspection */
     foreach ($stream as $value) {
@@ -153,7 +153,7 @@ function skeys(iterable $stream): Generator
  *
  * @return T|null
  */
-function slast(iterable $stream)
+function slast(iterable $stream): mixed
 {
     /** @var T|null $last */
     $last = null;
@@ -193,7 +193,7 @@ function smap(iterable $stream, callable $fn): Generator
  *
  * @return U|V
  */
-function sreduce(iterable $stream, callable $reducer, $carry)
+function sreduce(iterable $stream, callable $reducer, mixed $carry): mixed
 {
     foreach ($stream as $key => $value) {
         $carry = $reducer($carry, $value, $key);

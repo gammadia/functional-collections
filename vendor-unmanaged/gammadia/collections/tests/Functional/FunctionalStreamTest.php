@@ -30,7 +30,7 @@ final class FunctionalStreamTest extends TestCase
         self::assertTrue(sall($this->generator([true, true, true])));
 
         // This one demonstrates a custom function
-        self::assertTrue(sall($this->generator([42, '42', '42.1337', 42.1337, '0.0']), static fn ($value): bool
+        self::assertTrue(sall($this->generator([42, '42', '42.1337', 42.1337, '0.0']), static fn (mixed $value): bool
             => is_numeric($value)
         ));
 

@@ -37,11 +37,9 @@ final class UtilTest extends TestCase
     }
 
     /**
-     * @param mixed $iterable
-     *
      * @dataProvider invalidIterable
      */
-    public function testInvalidIterable($iterable): void
+    public function testInvalidIterable(mixed $iterable): void
     {
         $this->expectException(UnexpectedValueException::class);
         Util::assertIterable($iterable);
@@ -86,11 +84,9 @@ final class UtilTest extends TestCase
     }
 
     /**
-     * @param mixed $traversable
-     *
      * @dataProvider invalidTraversable
      */
-    public function testInvalidTraversable($traversable): void
+    public function testInvalidTraversable(mixed $traversable): void
     {
         $this->expectException(UnexpectedValueException::class);
         Util::assertTraversable($traversable);

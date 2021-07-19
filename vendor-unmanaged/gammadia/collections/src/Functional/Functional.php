@@ -69,11 +69,7 @@ function collect(array $array, callable $fn): array
     return flatten($chunks);
 }
 
-/**
- * @param string|int|null $column
- * @param string|int|null $index
- */
-function column(array $array, $column, $index = null): array
+function column(array $array, string|int|null $column, string|int|null $index = null): array
 {
     return array_column($array, $column, $index);
 }
@@ -83,10 +79,7 @@ function concat(array ...$arrays): array
     return array_merge([], ...$arrays);
 }
 
-/**
- * @param mixed $item
- */
-function contains(array $array, $item, bool $strict = false): bool
+function contains(array $array, mixed $item, bool $strict = false): bool
 {
     return in_array($item, $array, $strict);
 }
@@ -128,17 +121,14 @@ function each(array $array, callable $fn): array
 
 function eachSpread(array $array, callable $fn): array
 {
-    return each($array, static function (array $chunk, $key) use ($fn) {
+    return each($array, static function (array $chunk, mixed $key) use ($fn) {
         $chunk[] = $key;
 
         return $fn(...$chunk);
     });
 }
 
-/**
- * @param mixed|null $defaultValue
- */
-function fill(int $startIndex, int $num, $defaultValue = null): array
+function fill(int $startIndex, int $num, mixed $defaultValue = null): array
 {
     return array_fill($startIndex, $num, $defaultValue);
 }
@@ -163,10 +153,7 @@ function filter(array $array, ?callable $predicate = null): array
     return array_filter($array);
 }
 
-/**
- * @return mixed|null
- */
-function first(array $array)
+function first(array $array): mixed
 {
     return empty($array) ? null : $array[array_key_first($array)];
 }
@@ -182,16 +169,16 @@ function flip(array $array): array
 }
 
 /**
- * @param mixed $groupBy This is a callable or an array of callable. Can't manage to describe it in the PHPDoc.
+ * @param callable|callable[] $groupBy
  */
-function groupBy(array $array, $groupBy, bool $preserveKey = false): array
+function groupBy(array $array, callable|array $groupBy, bool $preserveKey = false): array
 {
     $nextGroups = [];
     if (is_array($groupBy)) {
         $nextGroups = $groupBy;
         $groupBy = array_shift($nextGroups);
     }
-
+    /** @var callable[] $nextGroups */
     if (!is_callable($groupBy)) {
         throw new InvalidArgumentException('The $groupBy argument must be a callable or an array of callables.');
     }
@@ -213,7 +200,7 @@ function groupBy(array $array, $groupBy, bool $preserveKey = false): array
     }
 
     if (!empty($nextGroups)) {
-        return map($results, static fn ($group): array => groupBy($group, $nextGroups, $preserveKey));
+        return map($results, static fn (array $group): array => groupBy($group, $nextGroups, $preserveKey));
     }
 
     return $results;
@@ -256,10 +243,7 @@ function keys(array $array): array
     return array_keys($array);
 }
 
-/**
- * @return mixed|null
- */
-function last(array $array)
+function last(array $array): mixed
 {
     return empty($array) ? null : $array[array_key_last($array)];
 }
@@ -277,7 +261,7 @@ function map(array $array, callable $fn, bool $withKeyArgument = false): array
 
 function mapSpread(array $array, callable $fn): array
 {
-    return map($array, static function (array $chunk, $key) use ($fn) {
+    return map($array, static function (array $chunk, mixed $key) use ($fn) {
         $chunk[] = $key;
 
         return $fn(...$chunk);
@@ -296,19 +280,14 @@ function mapWithKeys(array $array, callable $fn): array
     return $result;
 }
 
-/**
- * @param mixed $initial
- *
- * @return mixed
- */
-function reduce(array $array, callable $reducer, $initial = null, bool $withKeyArgument = false)
+function reduce(array $array, callable $reducer, mixed $initial = null, bool $withKeyArgument = false): mixed
 {
     if ($withKeyArgument) {
-        return array_reduce(keys($array), static function ($carry, $key) use ($reducer, $array) {
-            $carry = $reducer($carry, $array[$key], $key);
-
-            return $carry;
-        }, $initial);
+        return array_reduce(
+            keys($array),
+            static fn (mixed $carry, mixed $key): mixed => $reducer($carry, $array[$key], $key),
+            $initial
+        );
     }
 
     return array_reduce($array, $reducer, $initial);
@@ -341,7 +320,7 @@ function unique(array $array, ?callable $key = null, bool $strict = false): arra
 {
     $exists = [];
 
-    return array_filter($array, static function ($item) use ($key, $strict, &$exists): bool {
+    return array_filter($array, static function (mixed $item) use ($key, $strict, &$exists): bool {
         $id = $key ? $key($item) : $item;
 
         if (!in_array($id, $exists, $strict)) {
