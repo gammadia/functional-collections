@@ -79,9 +79,9 @@ function concat(array ...$arrays): array
     return array_merge([], ...$arrays);
 }
 
-function contains(array $array, mixed $item, bool $strict = false): bool
+function contains(array $array, mixed $value, bool $strict = false): bool
 {
-    return in_array($item, $array, $strict);
+    return in_array($value, $array, $strict);
 }
 
 function combine(array $keys, array $values): array
@@ -90,9 +90,7 @@ function combine(array $keys, array $values): array
     $result = array_combine($keys, $values);
 
     if (false === $result) {
-        throw new InvalidArgumentException(
-            'The number of elements for each array is not equal or the arrays are empty.'
-        );
+        throw new InvalidArgumentException('The number of elements for each array is not equal or the arrays are empty.');
     }
 
     return $result;
@@ -128,14 +126,17 @@ function eachSpread(array $array, callable $fn): array
     });
 }
 
-function fill(int $startIndex, int $num, mixed $defaultValue = null): array
+/**
+ * @param positive-int $count
+ */
+function fill(int $startIndex, int $count, mixed $defaultValue = null): array
 {
-    return array_fill($startIndex, $num, $defaultValue);
+    return array_fill($startIndex, $count, $defaultValue);
 }
 
-function fillWith(array $array, int $start, int $num, callable $generator): array
+function fillWith(array $array, int $start, int $count, callable $generator): array
 {
-    for ($i = 0; $i < $num; ++$i) {
+    for ($i = 0; $i < $count; ++$i) {
         $array[$i + $start] = $generator();
     }
 
@@ -171,7 +172,7 @@ function flip(array $array): array
 /**
  * @param callable|callable[] $groupBy
  */
-function groupBy(array $array, callable|array $groupBy, bool $preserveKey = false): array
+function groupBy(array $array, array|callable $groupBy, bool $preserveKey = false): array
 {
     $nextGroups = [];
     if (is_array($groupBy)) {
@@ -265,7 +266,7 @@ function mapSpread(array $array, callable $fn): array
         $chunk[] = $key;
 
         return $fn(...$chunk);
-    }, true);
+    }, withKeyArgument: true);
 }
 
 function mapWithKeys(array $array, callable $fn): array
@@ -286,7 +287,7 @@ function reduce(array $array, callable $reducer, mixed $initial = null, bool $wi
         return array_reduce(
             keys($array),
             static fn (mixed $carry, mixed $key): mixed => $reducer($carry, $array[$key], $key),
-            $initial
+            $initial,
         );
     }
 
