@@ -45,7 +45,7 @@ final class FunctionalTest extends TestCase
 
         // This one demonstrates a custom function
         self::assertTrue(all([42, '42', '42.1337', 42.1337, '0.0'], static fn (mixed $value): bool
-            => is_numeric($value)
+            => is_numeric($value),
         ));
 
         // These are cases you would expect to be false
@@ -157,8 +157,8 @@ final class FunctionalTest extends TestCase
         self::assertSame(
             [['id' => 1], 2 => ['id' => 3]],
             diffUsing($data, [['id' => 2]], fn (array $a, array $b): int
-                => $a['id'] <=> $b['id']
-            )
+                => $a['id'] <=> $b['id'],
+            ),
         );
     }
 
@@ -217,7 +217,7 @@ final class FunctionalTest extends TestCase
 
         // With a custom callback
         self::assertSame([2, 4], values(filter(range(1, 5), static fn (int $v): bool
-            => 0 === $v % 2
+            => 0 === $v % 2,
         )));
     }
 
@@ -259,17 +259,17 @@ final class FunctionalTest extends TestCase
 
         self::assertSame(
             [10 => ['a' => $a, 'b' => $b, 'c' => $c], 20 => ['d' => $d, 'e' => $e]],
-            groupBy($data, $extractA, true)
+            groupBy($data, $extractA, preserveKey: true),
         );
 
         self::assertSame(
             ['x' => [10 => [$a, $b]], 'y' => [10 => [$c], 20 => [$d, $e]]],
-            groupBy($data, [$extractB, $extractA])
+            groupBy($data, [$extractB, $extractA]),
         );
 
         self::assertSame(
             [10 => ['x' => ['a' => $a, 'b' => $b], 'y' => ['c' => $c]], 20 => ['y' => ['d' => $d, 'e' => $e]]],
-            groupBy($data, [$extractA, $extractB], true)
+            groupBy($data, [$extractA, $extractB], preserveKey: true),
         );
 
         self::assertSame([1 => [$a, $b, $e], 2 => [$a, $c, $e], 3 => [$a]], groupBy($data, $extractC));
@@ -293,7 +293,7 @@ final class FunctionalTest extends TestCase
     public function testIndexBy(): void
     {
         self::assertSame([1 => 2, 2 => 4], indexBy([2, 4], static fn (int $v): int
-            => $v / 2
+            => $v / 2,
         ));
     }
 
@@ -326,10 +326,10 @@ final class FunctionalTest extends TestCase
     public function testMap(): void
     {
         self::assertSame([2, 4], map([1, 2], static fn (int $v): int
-            => $v * 2
+            => $v * 2,
         ));
         self::assertSame([false, true], map([0, 1], static fn (int $v): bool
-            => (bool) $v
+            => (bool) $v,
         ));
     }
 
@@ -346,12 +346,8 @@ final class FunctionalTest extends TestCase
     public function testReduce(): void
     {
         self::assertNull(reduce([], static function (): void {}));
-        self::assertSame(6, reduce([1, 2, 3], static fn (int $carry, int $value): int
-            => $carry + $value
-        , 0));
-        self::assertSame('123', reduce([1, 2, 3], static fn (string $carry, int $value): string
-            => $carry . $value
-        , ''));
+        self::assertSame(6, reduce([1, 2, 3], static fn (int $carry, int $value): int => $carry + $value, initial: 0));
+        self::assertSame('123', reduce([1, 2, 3], static fn (string $carry, int $value): string => $carry . $value, initial: ''));
     }
 
     public function testReverse(): void
@@ -405,8 +401,8 @@ final class FunctionalTest extends TestCase
                     ['id' => 4, 'name' => 'John'],
                     ['id' => 5, 'name' => 'Paul'],
                 ],
-                $name
-            )
+                $name,
+            ),
         );
     }
 

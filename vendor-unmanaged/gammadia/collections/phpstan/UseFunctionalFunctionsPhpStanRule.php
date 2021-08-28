@@ -42,7 +42,7 @@ final class UseFunctionalFunctionsPhpStanRule implements Rule
                 sprintf(
                     'Please <info>use function %s;</info> instead of PHP\'s %s().',
                     $functionsToReplace[$functionName],
-                    $functionName
+                    $functionName,
                 ),
             ];
         }
