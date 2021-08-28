@@ -16,7 +16,7 @@ abstract class Optional
      */
     protected function __construct(
         private mixed $value,
-        private bool $none
+        private bool $none,
     ) {}
 
     /**
@@ -47,7 +47,7 @@ abstract class Optional
     public static function none(): self
     {
         /** @phpstan-ignore-next-line */
-        return new static(null, true);
+        return new static(value: null, none: true);
     }
 
     public function isNone(): bool

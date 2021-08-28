@@ -189,17 +189,17 @@ function smap(iterable $stream, callable $fn): Generator
  *
  * @param iterable<K, T> $stream
  * @param callable(U|V, T, K): V $reducer
- * @param U $carry
+ * @param U $initial
  *
  * @return U|V
  */
-function sreduce(iterable $stream, callable $reducer, mixed $carry): mixed
+function sreduce(iterable $stream, callable $reducer, mixed $initial): mixed
 {
     foreach ($stream as $key => $value) {
-        $carry = $reducer($carry, $value, $key);
+        $initial = $reducer($initial, $value, $key);
     }
 
-    return $carry;
+    return $initial;
 }
 
 /**

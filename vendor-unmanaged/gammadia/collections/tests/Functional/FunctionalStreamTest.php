@@ -31,7 +31,7 @@ final class FunctionalStreamTest extends TestCase
 
         // This one demonstrates a custom function
         self::assertTrue(sall($this->generator([42, '42', '42.1337', 42.1337, '0.0']), static fn (mixed $value): bool
-            => is_numeric($value)
+            => is_numeric($value),
         ));
 
         // These are cases you would expect to be false
@@ -55,7 +55,7 @@ final class FunctionalStreamTest extends TestCase
                 if (0 === $v % 2) {
                     yield $v * 2;
                 }
-            }))
+            })),
         );
         self::assertSame(
             [1, 2, 3, 6, 5, 10],
@@ -64,7 +64,7 @@ final class FunctionalStreamTest extends TestCase
                     yield $v;
                     yield $v * 2;
                 }
-            }))
+            })),
         );
 
         self::assertSame(
@@ -76,9 +76,9 @@ final class FunctionalStreamTest extends TestCase
                         if (strlen($name) <= 4) {
                             yield $name[0] => $name;
                         }
-                    }
-                )
-            )
+                    },
+                ),
+            ),
         );
     }
 
@@ -90,12 +90,12 @@ final class FunctionalStreamTest extends TestCase
         self::assertSame([1, 2], $this->values(sconcat($this->generator([1]), $this->generator([2]))));
         self::assertSame(
             [1, 2, 3, 4],
-            $this->values(sconcat($this->generator([1]), $this->generator([2, 3]), $this->generator([4])))
+            $this->values(sconcat($this->generator([1]), $this->generator([2, 3]), $this->generator([4]))),
         );
 
         self::assertSame(
             ['A' => 'A', 'B' => 'C'],
-            $this->array(sconcat($this->generator(['A' => 'A', 'B' => 'B']), $this->generator(['B' => 'C'])))
+            $this->array(sconcat($this->generator(['A' => 'A', 'B' => 'B']), $this->generator(['B' => 'C']))),
         );
     }
 
@@ -120,8 +120,8 @@ final class FunctionalStreamTest extends TestCase
         self::assertSame(
             [2, 4],
             $this->values(sfilter($this->generator(range(1, 5)), static fn (int $v): bool
-                => 0 === $v % 2
-            ))
+                => 0 === $v % 2,
+            )),
         );
     }
 
@@ -159,13 +159,13 @@ final class FunctionalStreamTest extends TestCase
     public function testMap(): void
     {
         self::assertSame([2, 4], $this->values(smap($this->generator([1, 2]), static fn (int $v): int
-            => $v * 2
+            => $v * 2,
         )));
         self::assertSame([0, 1], $this->values(smap($this->generator([2, 4]), static fn (int $v, int $k): int
-            => $k
+            => $k,
         )));
         self::assertSame([false, true], $this->values(smap($this->generator([0, 1]), static fn (int $v): bool
-            => (bool) $v
+            => (bool) $v,
         )));
     }
 
@@ -178,12 +178,8 @@ final class FunctionalStreamTest extends TestCase
     public function testReduce(): void
     {
         self::assertNull(sreduce($this->generator($this->emptyArray()), static function (): void {}, null));
-        self::assertSame(6, sreduce($this->generator([1, 2, 3]), static fn (int $carry, int $value): int
-            => $carry + $value
-        , 0));
-        self::assertSame('123', sreduce($this->generator([1, 2, 3]), static fn (string $carry, int $value): string
-            => $carry . $value
-        , ''));
+        self::assertSame(6, sreduce($this->generator([1, 2, 3]), static fn (int $carry, int $value): int => $carry + $value, initial: 0));
+        self::assertSame('123', sreduce($this->generator([1, 2, 3]), static fn (string $carry, int $value): string => $carry . $value, initial: ''));
     }
 
     public function testSome(): void
@@ -223,8 +219,8 @@ final class FunctionalStreamTest extends TestCase
                     ['id' => 4, 'name' => 'John'],
                     ['id' => 5, 'name' => 'Paul'],
                 ]),
-                $name
-            ))
+                $name,
+            )),
         );
     }
 
