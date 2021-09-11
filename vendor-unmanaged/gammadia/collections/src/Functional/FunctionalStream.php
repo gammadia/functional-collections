@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Gammadia\Collections\Functional;
 
 use Generator;
+use function in_array;
 
 /*
  * See

@@ -6,6 +6,11 @@ namespace Gammadia\Collections\Functional;
 
 use InvalidArgumentException;
 use Webmozart\Assert\Assert;
+use function array_slice;
+use function count;
+use function in_array;
+use function is_array;
+use function is_callable;
 
 const FUNCTIONS_REPLACEMENTS_MAP = [
     'array_chunk' => __NAMESPACE__ . '\\chunk',
