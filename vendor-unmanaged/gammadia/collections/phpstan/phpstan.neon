@@ -11,4 +11,3 @@ parameters:
             message: '#use function Gammadia\\Collections\\Functional\\#'
             paths:
                 - '../src/Functional/Functional.php'
-                - '../src/Functional/FunctionalStream.php'

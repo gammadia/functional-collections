@@ -6,6 +6,7 @@ namespace Gammadia\Collections\Functional;
 
 use InvalidArgumentException;
 use Webmozart\Assert\Assert;
+use function App\Infrastructure\Shared\Utils\equals;
 
 const FUNCTIONS_REPLACEMENTS_MAP = [
     'array_chunk' => __NAMESPACE__ . '\\chunk',
@@ -79,9 +80,15 @@ function concat(array ...$arrays): array
     return array_merge([], ...$arrays);
 }
 
-function contains(array $array, mixed $value, bool $strict = false): bool
+function contains(array $array, mixed $value): bool
 {
-    return in_array($value, $array, $strict);
+    foreach ($array as $item) {
+        if (equals($item, $value)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 function combine(array $keys, array $values): array
@@ -317,14 +324,14 @@ function tail(array $array): array
     return $array;
 }
 
-function unique(array $array, ?callable $key = null, bool $strict = false): array
+function unique(array $array, ?callable $key = null): array
 {
     $exists = [];
 
-    return array_filter($array, static function (mixed $item) use ($key, $strict, &$exists): bool {
+    return array_filter($array, static function (mixed $item) use ($key, &$exists): bool {
         $id = $key ? $key($item) : $item;
 
-        if (!in_array($id, $exists, $strict)) {
+        if (!contains($exists, $id)) {
             $exists[] = $id;
 
             return true;
