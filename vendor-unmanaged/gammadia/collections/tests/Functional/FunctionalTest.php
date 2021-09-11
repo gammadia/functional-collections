@@ -129,8 +129,7 @@ final class FunctionalTest extends TestCase
     public function testContains(): void
     {
         self::assertTrue(contains([1, 2, 3], 3));
-        self::assertTrue(contains([1, 2, 3], '3'));
-        self::assertFalse(contains([1, 2, 3], '3', true));
+        self::assertFalse(contains([1, 2, 3], '3'));
         self::assertFalse(contains([1, 2, 3], 4));
     }
 
@@ -383,8 +382,7 @@ final class FunctionalTest extends TestCase
         self::assertSame([1], unique([1, 1, 1]));
 
         // Strictness test
-        self::assertSame([1], unique([1, '1', 1]));
-        self::assertSame([1, '1'], unique([1, '1', 1], null, true));
+        self::assertSame([1, '1'], unique([1, '1', 1]));
 
         // Keys are preserved
         self::assertSame([0 => 1, 2 => 3, 4 => 2], unique([1, 1, 3, 1, 2, 1]));
