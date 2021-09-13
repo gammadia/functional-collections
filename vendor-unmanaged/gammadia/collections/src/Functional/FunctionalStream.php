@@ -207,7 +207,7 @@ function sreduce(iterable $stream, callable $reducer, mixed $initial): mixed
  * @template T
  *
  * @param iterable<K, T> $stream
- * @param callable(T, K): bool|null $predicate
+ * @param (callable(T, K): bool)|null $predicate
  */
 function ssome(iterable $stream, ?callable $predicate = null): bool
 {
