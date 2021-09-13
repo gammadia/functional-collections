@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Gammadia\Collections\Test\Unit\Functional;
 
+use Gammadia\Snowflake\Snowflake;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use stdClass;
+use UnexpectedValueException;
 use function Gammadia\Collections\Functional\all;
 use function Gammadia\Collections\Functional\chunk;
 use function Gammadia\Collections\Functional\collect;
+use function Gammadia\Collections\Functional\collectWithKeys;
 use function Gammadia\Collections\Functional\column;
 use function Gammadia\Collections\Functional\combine;
 use function Gammadia\Collections\Functional\concat;
@@ -26,6 +30,7 @@ use function Gammadia\Collections\Functional\flip;
 use function Gammadia\Collections\Functional\groupBy;
 use function Gammadia\Collections\Functional\indexBy;
 use function Gammadia\Collections\Functional\init;
+use function Gammadia\Collections\Functional\intersect;
 use function Gammadia\Collections\Functional\keys;
 use function Gammadia\Collections\Functional\last;
 use function Gammadia\Collections\Functional\map;
@@ -70,30 +75,173 @@ final class FunctionalTest extends TestCase
         self::assertSame([[1, 2, 3, 4]], chunk($data, 5));
     }
 
-    public function testCollect(): void
+    /**
+     * @dataProvider collect
+     *
+     * @param mixed[] $array
+     * @param mixed[] $expected
+     */
+    public function testCollect(array $array, callable $fn, array $expected): void
     {
-        $data = [1, 2, 3, 4, 5];
+        self::assertSame($expected, collect($array, $fn));
+    }
 
-        self::assertSame([4, 8], collect($data, function (int $v): iterable {
-            if (0 === $v % 2) {
-                yield $v * 2;
-            }
-        }));
+    /**
+     * @return iterable<mixed>
+     */
+    public function collect(): iterable
+    {
+        yield 'collect() without a condition acts like map(), but loses the keys' => [
+            [1 => 1, 2 => 2, 3 => 3],
+            static fn (int $v): iterable => yield $v * 2,
+            [0 => 2, 1 => 4, 2 => 6],
+        ];
 
-        self::assertSame([1, 2, 3, 6, 5, 10], collect($data, function (int $v, int $k): iterable {
-            if (0 === $k % 2) {
-                yield $v;
-                yield $v * 2;
-            }
-        }));
+        yield 'collect() can yield multiple times, but loses the keys' => [
+            [1, 2, 3],
+            static function (int $v): iterable {
+                yield 0 => $v;
+                yield 1 => $v * 2;
+            },
+            [1, 2, 2, 4, 3, 6],
+        ];
 
-        $data = ['Alex', 'Aude', 'Bob', 'Claire', 'Daniel'];
+        $map = [
+            1 => ['A' => 1, 'B' => 10, 'C' => 100],
+            2 => [2, 20, 200],
+            3 => [3, 30, 300],
+        ];
+        yield 'collect() can use "yield from ...", but loses the keys' => [
+            [1, 2, 3],
+            static fn (int $v): iterable => yield from $map[$v],
+            [1, 10, 100, 2, 20, 200, 3, 30, 300],
+        ];
 
-        self::assertSame(['A' => 'Aude', 'B' => 'Bob'], collect($data, function (string $name): iterable {
-            if (strlen($name) <= 4) {
+        yield 'collect() can filter data and return a partial array with auto-generated keys.' => [
+            [1, 2, 3, 4, 5],
+            static function (int $v): iterable {
+                if (0 === $v % 2) {
+                    yield $v * 2;
+                }
+            },
+            [4, 8],
+        ];
+
+        yield 'collect() loses the generator\'s yielded keys too and returns a new array with auto-generated keys.' => [
+            ['Alex', 'Aude', 'Bob', 'Charlie'],
+            static function (string $name): iterable {
+                if (strlen($name) <= 4) {
+                    yield $name[0] => $name;
+                }
+            },
+            [0 => 'Alex', 1 => 'Aude', 2 => 'Bob'],
+        ];
+
+        yield 'collect() does not care about the type of the generator\'s yielded key.' => [
+            ['Alex', 'Aude', 'Bob', 'Charlie'],
+            static function (string $name): iterable {
+                if (strlen($name) <= 4) {
+                    yield new stdClass() => $name;
+                }
+            },
+            [0 => 'Alex', 1 => 'Aude', 2 => 'Bob'],
+        ];
+    }
+
+    /**
+     * @dataProvider collectWithKeys
+     *
+     * @param mixed[] $array
+     * @param string|mixed[] $expected
+     */
+    public function testCollectWithKeys(array $array, callable $fn, string|array $expected): void
+    {
+        if (is_string($expected)) {
+            $this->expectException(UnexpectedValueException::class);
+            $this->expectExceptionMessage($expected);
+        }
+
+        self::assertSame($expected, collectWithKeys($array, $fn));
+    }
+
+    /**
+     * @return iterable<mixed>
+     */
+    public function collectWithKeys(): iterable
+    {
+        yield 'collectWithKeys() without a condition acts like map() with keys as long as there are no duplicated keys.' => [
+            ['Alex', 'Bob', 'Charlie'],
+            static function (string $name): iterable {
                 yield $name[0] => $name;
-            }
-        }));
+            },
+            ['A' => 'Alex', 'B' => 'Bob', 'C' => 'Charlie'],
+        ];
+
+        yield 'collectWithKeys() can yield only values if and only if *one* value ends up being yielded (as there cannot be a duplicated key).' => [
+            [1, 10, 100, 1000],
+            static function (int $v): iterable {
+                if (500 < $v) {
+                    yield $v;
+                }
+            },
+            [0 => 1000],
+        ];
+
+        yield 'collectWithKeys() can yield multiple times as long as there are no duplicated keys.' => [
+            [1, 10, 100, 1000],
+            static function (int $v): iterable {
+                if (50 < $v) {
+                    yield $v . '_1' => $v;
+                    yield $v . '_2' => $v * 2;
+                }
+            },
+            ['100_1' => 100, '100_2' => 200, '1000_1' => 1000, '1000_2' => 2000],
+        ];
+
+        $map = [
+            1 => ['A' => 1, 'B' => 10, 'C' => 100],
+            2 => ['D' => 2, 'E' => 20, 'F' => 200],
+            3 => ['G' => 3, 'H' => 30, 'I' => 300],
+        ];
+        yield 'collectWithKeys() can use "yield from ..." as long as there are no duplicated keys.' => [
+            [1, 2, 3],
+            static function (int $v) use ($map): iterable {
+                if (0 === $v % 2) {
+                    yield from $map[$v];
+                }
+            },
+            ['D' => 2, 'E' => 20, 'F' => 200],
+        ];
+
+        $dataLossErrorMessage = 'Data loss occurred because of duplicated keys. Use `collect()` if you do not care about the yielded keys, or use `scollect()` if you need to support duplicated keys (as arrays cannot).';
+
+        yield 'collectWithKeys() will throw an exception if multiple values are yielded and keys are not set (as the generator will use zero for all keys).' => [
+            [1, 2, 3, 4, 5],
+            static function (int $v): iterable {
+                if (0 === $v % 2) {
+                    yield $v * 2;
+                }
+            },
+            $dataLossErrorMessage,
+        ];
+
+        yield 'collectWithKeys() will throw an exception if multiples keys and values are yielded and keys have duplicates.' => [
+            ['Alex', 'Aude', 'Bob', 'Charlie'],
+            static function (string $name): iterable {
+                if (strlen($name) <= 4) {
+                    yield $name[0] => $name;
+                }
+            },
+            $dataLossErrorMessage,
+        ];
+
+        $invalidArrayKeyType = 'The key yielded in the callable is not compatible with the type "array-key".';
+
+        yield 'collectWithKeys() will throw an exception if an invalid array-key is yielded.' => [
+            ['Alex', 'Bob', 'Charlie'],
+            static fn (string $name): iterable => yield new stdClass() => $name,
+            $invalidArrayKeyType,
+        ];
     }
 
     public function testColumn(): void
@@ -274,9 +422,33 @@ final class FunctionalTest extends TestCase
         self::assertSame([1 => [$a, $b, $e], 2 => [$a, $c, $e], 3 => [$a]], groupBy($data, $extractC));
     }
 
-    public function testIntersect(): void
+    /**
+     * @dataProvider intersect
+     *
+     * @param mixed[] $array
+     * @param mixed[] $others
+     * @param mixed[] $expected
+     */
+    public function testIntersect(array $array, array $others, array $expected): void
     {
-        self::markTestIncomplete('@todo Implement this');
+        self::assertEquals($expected, intersect($array, ...$others));
+    }
+
+    /**
+     * @return iterable<mixed>
+     */
+    public function intersect(): iterable
+    {
+        yield 'Strict types works' => [
+            [Snowflake::cast(42), Snowflake::cast(13)],
+            [[Snowflake::cast(42)]],
+            [Snowflake::cast(42)],
+        ];
+        yield 'Unstrict types work too : it should return the value of the first array (supposedly)...' => [
+            [42, Snowflake::cast(13)],
+            [[Snowflake::cast(42)]],
+            [42],
+        ];
     }
 
     public function testIntersectUsing(): void
@@ -333,11 +505,6 @@ final class FunctionalTest extends TestCase
     }
 
     public function testMapSpread(): void
-    {
-        self::markTestIncomplete('@todo Implement this');
-    }
-
-    public function testMapWithKeys(): void
     {
         self::markTestIncomplete('@todo Implement this');
     }

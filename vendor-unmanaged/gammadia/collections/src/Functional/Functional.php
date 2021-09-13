@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Gammadia\Collections\Functional;
 
 use InvalidArgumentException;
+use TypeError;
+use UnexpectedValueException;
 use Webmozart\Assert\Assert;
 use function App\Infrastructure\Shared\Utils\equals;
+use function count;
 
 const FUNCTIONS_REPLACEMENTS_MAP = [
     'array_chunk' => __NAMESPACE__ . '\\chunk',
@@ -62,12 +65,39 @@ function chunk(array $array, int $size, bool $preserveKey = false): array
 
 function collect(array $array, callable $fn): array
 {
-    $chunks = [];
-    foreach ($array as $key => $value) {
-        $chunks[] = iterator_to_array(Util::assertTraversable($fn($value, $key)));
+    /** @phpstan-ignore-next-line */
+    $stream = scollect($array, $fn);
+
+    return iterator_to_array($stream, preserve_keys: false);
+}
+
+function collectWithKeys(array $array, callable $fn): array
+{
+    /** @phpstan-ignore-next-line */
+    $stream = scollect($array, $fn);
+
+    $values = [];
+    $counter = 0;
+
+    foreach ($stream as $key => $value) {
+        try {
+            $values[$key] = $value;
+            /** @phpstan-ignore-next-line That's probably a PHPStan bug as the catch can definitely happen */
+        } catch (TypeError) {
+            throw new UnexpectedValueException('The key yielded in the callable is not compatible with the type "array-key".');
+        }
+
+        ++$counter;
     }
 
-    return flatten($chunks);
+    if ($counter !== count($values)) {
+        throw new UnexpectedValueException(
+            'Data loss occurred because of duplicated keys. Use `collect()` if you do not care about ' .
+            'the yielded keys, or use `scollect()` if you need to support duplicated keys (as arrays cannot).',
+        );
+    }
+
+    return $values;
 }
 
 function column(array $array, string|int|null $column, string|int|null $index = null): array
@@ -214,6 +244,9 @@ function groupBy(array $array, array|callable $groupBy, bool $preserveKey = fals
     return $results;
 }
 
+/**
+ * @todo BEWARE! This method does unstrict comparisons. Fix that someday.
+ */
 function intersect(array $array, array ...$others): array
 {
     return array_intersect($array, ...$others);
@@ -274,18 +307,6 @@ function mapSpread(array $array, callable $fn): array
 
         return $fn(...$chunk);
     }, withKeyArgument: true);
-}
-
-function mapWithKeys(array $array, callable $fn): array
-{
-    $result = [];
-    foreach ($array as $key => $value) {
-        foreach (Util::assertIterable($fn($value, $key)) as $mapKey => $mapValue) {
-            $result[$mapKey] = $mapValue;
-        }
-    }
-
-    return $result;
 }
 
 function reduce(array $array, callable $reducer, mixed $initial = null, bool $withKeyArgument = false): mixed
