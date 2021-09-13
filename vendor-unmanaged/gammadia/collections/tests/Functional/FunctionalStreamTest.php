@@ -21,6 +21,7 @@ use function Gammadia\Collections\Functional\sreduce;
 use function Gammadia\Collections\Functional\ssome;
 use function Gammadia\Collections\Functional\sunique;
 use function Gammadia\Collections\Functional\svalues;
+use function strlen;
 
 final class FunctionalStreamTest extends TestCase
 {

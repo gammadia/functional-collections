@@ -6,6 +6,7 @@ namespace Gammadia\Collections\Test\Unit\Functional;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use function func_get_args;
 use function Gammadia\Collections\Functional\all;
 use function Gammadia\Collections\Functional\chunk;
 use function Gammadia\Collections\Functional\collect;
@@ -35,6 +36,7 @@ use function Gammadia\Collections\Functional\tail;
 use function Gammadia\Collections\Functional\unique;
 use function Gammadia\Collections\Functional\values;
 use function Gammadia\Collections\Functional\window;
+use function strlen;
 
 final class FunctionalTest extends TestCase
 {

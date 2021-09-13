@@ -24,7 +24,7 @@ final class Util
     }
 
     /**
-     * @return \Traversable<mixed>
+     * @return Traversable<mixed>
      */
     public static function assertTraversable(mixed $traversable): Traversable
     {
