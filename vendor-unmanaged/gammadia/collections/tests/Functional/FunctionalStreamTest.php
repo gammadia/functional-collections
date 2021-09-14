@@ -104,8 +104,7 @@ final class FunctionalStreamTest extends TestCase
     {
         // Here we cannot use the same Generator again as it cannot be rewind (because it's not entirely run)
         self::assertTrue(scontains($this->generator([1, 2, 3]), 3));
-        self::assertTrue(scontains($this->generator([1, 2, 3]), '3'));
-        self::assertFalse(scontains($this->generator([1, 2, 3]), '3', true));
+        self::assertFalse(scontains($this->generator([1, 2, 3]), '3'));
         self::assertFalse(scontains($this->generator([1, 2, 3]), 4));
     }
 
@@ -202,8 +201,8 @@ final class FunctionalStreamTest extends TestCase
         self::assertSame([1], $this->array(sunique($this->generator([1, 1, 1]))));
 
         // Strictness test
-        self::assertSame([1], $this->array(sunique($this->generator([1, '1', 1]))));
-        self::assertSame([1, '1'], $this->array(sunique($this->generator([1, '1', 1]), null, true)));
+        self::assertNotSame([1], $this->array(sunique($this->generator([1, '1', 1]))));
+        self::assertSame([1, '1'], $this->array(sunique($this->generator([1, '1', 1]))));
 
         // Keys are preserved
         self::assertSame([0 => 1, 2 => 3, 4 => 2], $this->array(sunique($this->generator([1, 1, 3, 1, 2, 1]))));

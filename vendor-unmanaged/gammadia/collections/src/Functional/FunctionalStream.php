@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Gammadia\Collections\Functional;
 
 use Generator;
-use function in_array;
+use function App\Infrastructure\Shared\Utils\equals;
 
 /*
  * See
@@ -68,13 +68,12 @@ function sconcat(iterable ...$streams): Generator
  * @template T
  *
  * @param iterable<T> $stream
- * @param T $item
+ * @param T $value
  */
-function scontains(iterable $stream, mixed $item, bool $strict = false): bool
+function scontains(iterable $stream, mixed $value): bool
 {
-    foreach ($stream as $value) {
-        /** @noinspection TypeUnsafeComparisonInspection */
-        if ($strict ? $item === $value : $item == $value) {
+    foreach ($stream as $item) {
+        if (equals($item, $value)) {
             return true;
         }
     }
@@ -208,7 +207,7 @@ function sreduce(iterable $stream, callable $reducer, mixed $initial): mixed
  * @template T
  *
  * @param iterable<K, T> $stream
- * @param callable(T, K): bool|null $predicate
+ * @param (callable(T, K): bool)|null $predicate
  */
 function ssome(iterable $stream, ?callable $predicate = null): bool
 {
@@ -249,13 +248,13 @@ function soffset(iterable $stream, int $n): Generator
  *
  * @return Generator<K, T>
  */
-function sunique(iterable $stream, ?callable $key = null, bool $strict = false): Generator
+function sunique(iterable $stream, ?callable $key = null): Generator
 {
     $exists = [];
 
     foreach ($stream as $skey => $value) {
         $k = null !== $key ? $key($value, $skey) : $value;
-        if (!in_array($k, $exists, $strict)) {
+        if (!contains($exists, $k)) {
             $exists[] = $k;
             yield $skey => $value;
         }
