@@ -386,5 +386,6 @@ function window(array $array, int $width): array
 
 function zip(array ...$arrays): array
 {
+    /** @phpstan-ignore-next-line Remove this once we upgrade to PHPStan 1.0 after 2021-11-01, cf. https://github.com/phpstan/phpstan/issues/5730 */
     return array_map(null, ...$arrays);
 }
