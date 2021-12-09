@@ -13,13 +13,13 @@
     },
     "autoload": {
         "files": [
-            "vendor-unmanaged/gammadia/collections/src/Functional/Functional.php",
-            "vendor-unmanaged/gammadia/collections/src/Functional/FunctionalStream.php"
+            "src/Functional.php",
+            "src/FunctionalStream.php"
         ]
     },
     "autoload-dev": {
         "psr-4": {
-            "Functional\\": "legacy/tests/Functional/"
+            "Gammadia\\Collections\\Test\\Unit\\Functional\\": "tests/"
         }
     }
 }
