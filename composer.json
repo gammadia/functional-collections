@@ -1,4 +1,25 @@
 {
     "name": "gammadia/functional-collections",
-    "type": "library"
+    "type": "library",
+    "authors": [
+        {
+            "name": "Gammadia S.A.",
+            "email": "info@gammadia.ch"
+        }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "webmozart/assert": "^1.10"
+    },
+    "autoload": {
+        "files": [
+            "vendor-unmanaged/gammadia/collections/src/Functional/Functional.php",
+            "vendor-unmanaged/gammadia/collections/src/Functional/FunctionalStream.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Functional\\": "legacy/tests/Functional/"
+        }
+    }
 }
